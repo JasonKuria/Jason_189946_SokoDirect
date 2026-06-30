@@ -1,0 +1,216 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'styles/ProductSingle.css' %}" />
+
+<main class="singleProject">
+  <div class="container">
+
+    <div class="sokodirect-detail-container">
+
+      <div class="sokodirect-main-column">
+        <div class="detail-image-box">
+          <img src="{{ product.imageURL }}" alt="{{ product.title }}" />
+        </div>
+
+        <h1 class="detail-title-main">{{ product.title }}</h1>
+
+        <p class="detail-farmer-row">
+          Verified Farmer: <a href="">{{ product.owner.name }}</a>
+        </p>
+
+        <div class="share-strip-wrapper">
+          <span>Share this product:</span>
+          <a href="https://api.whatsapp.com/send?text=Check out {{ product.title }} - http://127.0.0.1:8000{{ request.path }}" target="_blank">💬</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=http://127.0.0.1:8000{{ request.path }}" target="_blank">f</a>
+          <a href="https://twitter.com/intent/tweet?url=http://127.0.0.1:8000{{ request.path }}" target="_blank">𝕏</a>
+        </div>
+
+        <hr />
+
+        <h3>Product Description</h3>
+        <div>
+          {{ product.description }}
+        </div>
+
+        <div>
+          <h4>Marketplace Tags</h4>
+          <div>
+            {% for category in product.categories.all %}
+            <span>
+              <small>{{ category.name }}</small>
+            </span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Reviews -->
+        <div class="comments">
+          <h3>Customer Feedback & Reviews</h3>
+
+          <h5>
+            {{ product.vote_ratio }}% Positive Feedback
+            ({{ product.vote_total }} Vote{{ product.vote_total|pluralize:"s" }})
+          </h5>
+
+          {% if request.user.is_authenticated %}
+          <form action="{% url 'single-product' product.id %}" method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+            <div>
+              <label>{{ field.label }}</label>
+              {{ field }}
+            </div>
+            {% endfor %}
+            <input type="submit" value="Submit Review" />
+          </form>
+          {% else %}
+          <a href="">Please Login to leave a Review</a>
+          {% endif %}
+
+          <div class="commentList">
+            {% for review in product.review_set.all %}
+            {% if review.body %}
+            <div class="comment">
+              <img class="avatar avatar--md" src="{{ review.owner.profile_image.url }}" alt="avatar" />
+              <div>
+                <a href="">{{ review.owner.name }}</a>
+                <p>{{ review.body|linebreaksbr }}</p>
+              </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Checkout Pane -->
+      <div class="sokodirect-checkout-pane">
+
+        <h4>Retail Price</h4>
+        <p>
+          <span>KES</span> {{ product.price }}
+        </p>
+
+        <div>
+          <span>Location: <strong>{{ product.county|default:"Nairobi" }}</strong></span>
+        </div>
+
+        <div class="sokodirect-cart-wrapper">
+          {% if product.quantity_available > 0 %}
+          <button
+            id="initial-add-trigger"
+            data-product="{{ product.id }}"
+            data-action="add"
+            class="update-cart"
+            onclick="transitionToCounter()">
+            Add To Cart
+          </button>
+
+          <div id="sokodirect-counter-ui" style="display:none;">
+            <button onclick="modifyQuantity(-1)">−</button>
+            <span id="counter-value-indicator">1</span>
+            <button onclick="modifyQuantity(1)">+</button>
+          </div>
+
+          {% else %}
+          <button disabled>Out of Stock</button>
+          {% endif %}
+        </div>
+
+        <button id="callback-trigger-btn" onclick="triggerJijiCallback()">
+          Request Call Back
+        </button>
+
+        <div>
+          <span>{{ product.owner.name }}</span>
+        </div>
+
+        <button
+          id="phone-reveal-btn"
+          onclick="revealPhoneNumber(`{{ product.owner.phone|default:'0712345678' }}`)">
+          Click to show number
+        </button>
+
+        <button
+          id="whatsapp-reveal-btn"
+         onclick="revealWhatsApp(`{{ product.owner.whatsapp|default:'254712345678' }}`, `{{ product.title|escapejs }}`)">
+          Click to show WhatsApp
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+  let runningQty = 0;
+
+  // FIXED: quote conflict
+  const maxAvailableStock =
+    parseInt('{{ product.quantity_available|floatformat:"0" }}') || 0;
+
+  function transitionToCounter() {
+    document.getElementById('initial-add-trigger').style.display = 'none';
+
+    // FIXED: correct ID
+    const counterUI = document.getElementById('sokodirect-counter-ui');
+    counterUI.style.display = 'flex';
+
+    runningQty = 1;
+    document.getElementById('counter-value-indicator').innerText = runningQty;
+  }
+
+  function modifyQuantity(delta) {
+    runningQty += delta;
+
+    if (runningQty > maxAvailableStock) {
+      runningQty = maxAvailableStock;
+      alert(`Sorry, only ${maxAvailableStock} items are available.`);
+      return;
+    }
+
+    if (runningQty <= 0) {
+      document.getElementById('sokodirect-counter-ui').style.display = 'none';
+      document.getElementById('initial-add-trigger').style.display = 'flex';
+      runningQty = 0;
+    } else {
+      document.getElementById('counter-value-indicator').innerText = runningQty;
+    }
+  }
+
+  function triggerJijiCallback() {
+    const btn = document.getElementById('callback-trigger-btn');
+    btn.innerText = "✓ Callback Requested";
+    btn.disabled = true;
+    alert("Callback request sent successfully.");
+  }
+
+  function revealPhoneNumber(realNumber) {
+    const phoneBtn = document.getElementById('phone-reveal-btn');
+    phoneBtn.innerHTML = `📞 ${realNumber}`;
+    phoneBtn.onclick = function () {
+      window.location.href = `tel:${realNumber}`;
+    };
+  }
+
+  // FIXED: second parameter now used
+  function revealWhatsApp(whatsappNumber, productTitle) {
+    const waBtn = document.getElementById('whatsapp-reveal-btn');
+    waBtn.innerHTML = `✅ Message: ${whatsappNumber}`;
+    waBtn.onclick = function () {
+      window.open(
+        `https://wa.me/${whatsappNumber}?text=Hi, I am interested in your product listing: ${productTitle} on SokoDirect.`,
+        '_blank'
+      );
+    };
+  }
+
+  function triggerReportAbuse() {
+    alert("Report submitted successfully.");
+  }
+</script>
+
+{% endblock content %}

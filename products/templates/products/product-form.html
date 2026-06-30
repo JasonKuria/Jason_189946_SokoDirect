@@ -1,0 +1,98 @@
+{% extends 'main.html' %}
+{% block content %}
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'styles/productForm.css' %}" />
+
+<main class="formPage my-xl">
+    <div class="SokoDirect-split-workspace">
+        
+        <div class="soko-marketing-panel">
+            <div class="soko-badge-callout">SokoDirect Merchant Hub</div>
+            <h1 class="soko-pitch-headline">Your Buyers or Farmers are on SokoDirect. <span>Why Aren't You?</span></h1>
+            <p class="soko-pitch-sub">Start selling or advertising your products/produce online today in just a few simple steps.</p>
+            
+            <div class="soko-benefit-row">
+                <div class="soko-benefit-icon"></div>
+                <div>
+                    <h3 class="soko-benefit-title">Reach Millions of Buyers and Farmers</h3>
+                    <p class="soko-benefit-desc">SokoDirect is now in millions of houses all around Kenya. Get the chance to showcase your farm fresh products to millions of active clients every single day.</p>
+                </div>
+            </div>
+
+            <div class="soko-benefit-row">
+                <div class="soko-benefit-icon"></div>
+                <div>
+                    <h3 class="soko-benefit-title">It's free to open your Farm Store</h3>
+                    <p class="soko-benefit-desc">Opening a digital Farmers store on SokoDirect is absolutely free. Set up your digital profile anytime and start selling as quickly as you can upload pictures.</p>
+                </div>
+            </div>
+
+            <div class="soko-benefit-row">
+                <div class="soko-benefit-icon"></div>
+                <div>
+                    <h3 class="soko-benefit-title">Large Support Team</h3>
+                    <p class="soko-benefit-desc">Our highly dedicated team of Vendor support specialists is always on standby to offer rapid guidance and advice on any store management inquiries.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="SokoDirect-seller-container">
+            <div class="back-nav-box">
+                <a class="backButton-styled" href="{% url 'account' %}">⬅ Back to Dashboard</a>
+            </div>
+
+            <div class="SokoDirect-seller-banner">
+                <h2>Create Advertisement Listing</h2>
+                <p>Provide detailed, rich specifications below to catch maximum consumer visibility.</p>
+            </div>
+
+            <form action="" method="POST" enctype="multipart/form-data" class="SokoDirect-styled-form">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="form-group-row">
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        
+                        {% if field.errors %}
+                            <div style="margin-top: 4px;">
+                                <small style="color: #e74c3c; font-size: 1.2rem; font-weight: 500;">{{ field.errors.as_text }}</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <button type="submit" class="SokoDirect-submit-btn">
+                    START SELLING / Advertising Now
+                </button>
+            </form>
+        </div>
+
+    </div>
+</main>
+
+<script>
+    // Handles dynamic multi-category tag removal mechanisms via API asynchronously
+    let categoryTags = document.getElementsByClassName('product-category');
+    for (let i = 0; categoryTags.length > i; i++) {
+        categoryTags[i].addEventListener('click', (e)=> {
+            let categoryID = e.target.dataset.categoryId;
+            let productID = e.target.dataset.product;
+
+            fetch('http://127.0.0.1:8000/api/remove-category/', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 'productId': productID, 'categoryId': categoryID })
+            })
+            .then(response => response.json())
+            .then(data => {
+                e.target.remove();
+            });
+        });
+    }
+</script>
+
+{% endblock content %}
