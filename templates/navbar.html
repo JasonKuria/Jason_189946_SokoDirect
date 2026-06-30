@@ -1,0 +1,158 @@
+{% load static %}
+
+<header class="header" style="background-color: #113821 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-bottom: 3px solid #1e8a57; padding: 0;">
+  
+  <div style="padding: 1rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.15);">
+    <div class="container container--narrow" style="display: flex; align-items: center; justify-content: space-between; gap: 2rem; max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+      
+      <!-- 1. LEFT SIDE: Brand Logo -->
+      <a href="{% url 'products' %}" class="header__logo" style="flex-shrink: 0; display: flex; align-items: center; transition: transform 0.2s ease;">
+        <img src="{% static 'images/GoodLogo01.png' %}" alt="SokoDirect Logo" style="height: 3.8rem; display: block;" />
+      </a>
+
+      <!-- 2. CENTER: Main Navigation Links & Search -->
+      <div style="display: flex; align-items: center; gap: 3rem; flex-grow: 1; justify-content: center; max-width: 750px;">
+        <ul style="display: flex; align-items: center; gap: 2.5rem; list-style: none; margin: 0; padding: 0; flex-shrink: 0;">
+          <li>
+            <a href="" style="color: #f8fafc !important; font-weight: 600; font-size: 1.4rem; text-decoration: none; transition: color 0.2s;">Farmers</a>
+          </li>
+          <li>
+            <a href="{% url 'products' %}" style="color: #f8fafc !important; font-weight: 600; font-size: 1.4rem; text-decoration: none; transition: color 0.2s;">Products</a>
+          </li>
+        </ul>
+
+        <div class="header__search" style="flex-grow: 1; max-width: 420px; margin: 0 1rem;">
+          <form id="globalSearchForm" action="{% url 'products' %}" method="get" style="display: flex; background: #ffffff; border-radius: 24px; padding: 3px 4px 3px 8px; width: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin: 0; border: 1px solid #e2e8f0;">
+            <input 
+              type="text" 
+              name="search_query" 
+              placeholder="Search produce..." 
+              value="{{search_query|default:''}}"
+              style="flex-grow: 1; border: none !important; padding: 6px 12px !important; font-size: 1.3rem !important; color: #1e293b !important; background: transparent !important; outline: none !important; height: auto !important;"
+            />
+            <button type="submit" style="background-color: #f1c40f !important; color: #113821 !important; border: none !important; padding: 0 18px !important; font-size: 1.3rem !important; font-weight: 700 !important; border-radius: 20px !important; cursor: pointer !important; transition: all 0.2s ease;">
+              Search
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- 3. RIGHT SIDE: Action Controls & Authentication Status -->
+      <nav class="header__nav" style="flex-shrink: 0;">
+        <input type="checkbox" id="responsive-menu" />
+        <label for="responsive-menu" class="toggle-menu">
+          <span>Menu</span>
+          <div class="toggle-menu__lines"></div>
+        </label>
+        <ul class="header__menu" style="display: flex; align-items: center; gap: 2rem; list-style: none; margin: 0; padding: 0;">
+          
+          {% if request.user.is_authenticated %}
+            <!-- Combined dynamic click target link matching the exact #284b36 color scheme -->
+            <li class="header__menuItem">
+              <a href="" 
+                style="text-decoration: none; 
+                        color: #ffffff !important; 
+                        background-color: #284b36 !important; 
+                        font-weight: 600; 
+                        font-size: 1.35rem; 
+                        display: inline-flex; 
+                        align-items: center; 
+                        gap: 8px; 
+                        padding: 6px 14px; 
+                        border-radius: 6px; 
+                        border: 1px solid rgba(255, 255, 255, 0.15);
+                        transition: all 0.2s ease;" 
+                onmouseover="this.style.backgroundColor='#113821'; this.style.borderColor='rgba(255, 255, 255, 0.3)';" 
+                onmouseout="this.style.backgroundColor='#284b36'; this.style.borderColor='rgba(255, 255, 255, 0.15)';">
+                
+                <!-- Clean White User Icon -->
+                <svg width="14" height="14" fill="#ffffff" viewBox="0 0 16 16" style="display: block; opacity: 0.9;">
+                  <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                </svg>
+                
+                <span style="color: #ffffff; font-size: 1.20rem; font-weight: 600;">Hi, {{ request.user.first_name|default:request.user.username|slice:":10" }}</span>
+                
+                <!-- Dropdown indicator arrow -->
+                <span style="font-size: 0.85rem; color: #ffffff; opacity: 0.6;">▼</span>
+              </a>
+            </li>
+
+            <li class="header__menuItem"><a href="" style="color: #f8fafc !important; font-weight: 600; font-size: 1.4rem; text-decoration: none;">Inbox</a></li>
+            
+            <!-- Clean Red Logout Button -->
+            <li class="header__menuItem">
+              <a href="" class="btn" style="background-color: #b91c1c !important; color: #ffffff !important; padding: 6px 14px; border-radius: 6px; font-size: 1.3rem; font-weight: 600; text-decoration: none; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background 0.2s;" onmouseover="this.style.backgroundColor='#991b1b'" onmouseout="this.style.backgroundColor='#b91c1c'">
+                Logout
+              </a>
+            </li>
+          {% else %}
+            <li class="header__menuItem"><a href="" class="btn" style="background-color: #1e8a57 !important; color: white !important; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 1.3rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Login/Sign Up</a></li>  
+          {% endif %}
+
+
+
+
+          <li class="header__menuItem">
+              <a href="" style="background: #1e8a57; padding: 6px 14px; border-radius: 20px; 
+                        display: inline-flex; align-items: center; text-decoration: none; color: #fff; 
+                        font-weight: 600; font-size: 1.3rem; border: 1px solid rgba(255,255,255,0.1);">
+                  Cart 
+                  <!-- Added style back to make the counter visible as a badge -->
+                  <span id="cart-count" style="background: #f1c40f; color: #113821; padding: 1px 6px; border-radius: 50%; font-size: 1rem; margin-left: 8px; font-weight: 800;">
+                      {{ cartItems|default:"0" }}
+                  </span>
+              </a>
+          </li>          
+          
+
+
+
+                    
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div class="subheader-bar" style="background-color: #0d2b1a !important; padding: 0.4rem 0;">
+    <span class="container container--narrow" style="display: flex; align-items: center; justify-content: flex-end; max-width: 1200px; margin: 0 auto; padding: 0 2rem; gap: 8px; color: rgba(255,255,255,0.3); font-size: 1.1rem;">
+      <a href="" class="btn-post-ad-global"
+        style="padding:4px 8px; font-size:1.1rem; font-weight:700;
+                text-transform:uppercase; text-decoration:none; color:#f1c40f !important;">
+        Home
+      </a>
+      |
+      <a href="" class="btn-post-ad-global"
+        style="padding:4px 8px; font-size:1.1rem; font-weight:700;
+                text-transform:uppercase; text-decoration:none; color:#f1c40f !important;">
+        FAQ
+      </a>
+      {% if request.user.first_name %}
+        <a href="{% url 'create-product' %}" class="btn-post-ad-global" style="padding: 4px 8px; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; text-decoration: none; color: #f1c40f !important;">
+          Post an Item / Produce AD
+        </a>
+        |
+        <a href="{% url 'userdashboard' %}" class="btn-post-ad-global" style="padding: 4px 8px; font-size: 1.1rem; font-weight: 700; 
+                                                                              text-transform: uppercase; text-decoration: none; 
+                                                                              color: #f1c40f !important;">
+          Farmers/Buyers Dashboard
+        </a>
+        
+        
+
+        | 
+        <a href="{% url 'orders_dashboard' %}" class="btn-post-ad-global"
+            style="padding:4px 8px; font-size:1.1rem; font-weight:700;
+                    text-transform:uppercase; text-decoration:none; color:#f1c40f !important;">
+            All Orders
+        </a>    
+      {% endif %}  
+        | 
+      <a href="" class="btn-post-ad-global"
+        style="padding:4px 8px; font-size:1.1rem; font-weight:700;
+                text-transform:uppercase; text-decoration:none; color:#f1c40f !important;">
+        Contact
+      </a>      
+    </span>
+  </div>
+</header>
+

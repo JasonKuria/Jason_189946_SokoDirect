@@ -1,0 +1,68 @@
+<!-- templates/footer.html -->
+
+{% load static %}
+
+<footer class="main-footer" style="background-color: #1e293b !important; 
+color: #cbd5e1 !important; padding: 1.5rem 0 2rem 0 !important; 
+font-size: 1.3rem; border-top: 4px solid #3ab54a; margin-top: 0 !important;">
+
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-bottom: 3rem;">
+      
+      <div>
+        <h3 style="color: #ffffff !important; font-size: 1.6rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px;">
+          <span style="color: #3ab54a;">c</span> SokoDirect
+        </h3>
+        <p style="line-height: 1.6; color: #94a3b8; margin-bottom: 15px;">
+          Connecting verified local farmers directly to retail and wholesale consumers across Nairobi and regional trade corridors. Freshness, transparency, and fair value.
+        </p>
+      </div>
+
+      <div>
+        <h4 style="color: #ffffff !important; font-size: 1.4rem; font-weight: 600; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">Let Us Help You</h4>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li><a href="{% url 'products' %}" style="color: #94a3b8; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#3ab54a'" onmouseout="this.style.color='#94a3b8'">Browse Fresh Produce</a></li>
+          <li><a href="#" style="color: #94a3b8; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#3ab54a'" onmouseout="this.style.color='#94a3b8'">Help Center & Support</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 style="color: #ffffff !important; font-size: 1.4rem; font-weight: 600; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">Make Money with Us</h4>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li><a href="{% url 'products' %}" style="color: #94a3b8; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#3ab54a'" onmouseout="this.style.color='#94a3b8'">Verified Farmer Registry</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 style="color: #ffffff !important; font-size: 1.4rem; font-weight: 600; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">Join SokoDirect</h4>
+        <p style="line-height: 1.5; color: #94a3b8; margin-bottom: 12px;">Subscribe to receive price drops and seasonal harvest alerts.</p>
+        <form style="display: flex; gap: 6px; margin: 0;">
+          <input type="email" placeholder="Your Email..." style="flex-grow: 1; padding: 8px 12px !important; border-radius: 4px !important; border: 1px solid #475569 !important; background: #0f172a !important; color: #ffffff !important; font-size: 1.2rem !important; height: auto !important; outline: none !important;" required />
+          <button type="submit" style="background-color: #3ab54a !important; color: white !important; padding: 0 14px !important; border: none !important; border-radius: 4px !important; font-weight: 600; font-size: 1.2rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#2e933c'" onmouseout="this.style.backgroundColor='#3ab54a'">
+            Join
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #334155; margin: 2rem 0;" />
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+      
+      <div style="color: #64748b; font-weight: 500;">
+        &copy; 2026 SokoDirect Marketplace. All Rights Reserved. Built with for Regional Agro-Commerce.
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 15px; color: #64748b; font-size: 1.2rem; font-weight: 600;">
+        <span>Payment & Security Escrow Framework:</span>
+        <span style="background: #2e7d32; color: #ffffff; padding: 2px 6px; border-radius: 3px; font-size: 1.05rem;">M-PESA</span>
+        <span style="background: #0ea5e9; color: #ffffff; padding: 2px 6px; border-radius: 3px; font-size: 1.05rem;">CARD SSL</span>
+        <span style="background: #475569; color: #ffffff; padding: 2px 6px; border-radius: 3px; font-size: 1.05rem;">SECURE PAY</span>
+      </div>
+
+    </div>
+
+  </div>
+</footer>

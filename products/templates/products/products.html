@@ -1,0 +1,182 @@
+{% extends 'main.html' %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'styles/products.css' %}" />
+
+<main class="projects">
+  <section class="projectsList" style="margin-top: 1rem;">
+    <div class="products-layout">
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- LEFT SIDEBAR — CATEGORY TREE            -->
+      <!-- ════════════════════════════════════════ -->
+      <aside class="category-sidebar">
+        <div class="sidebar-box">
+          <div class="sidebar-box-title">Browse Category</div>
+
+          <!-- All Produce -->
+          <a href="{% url 'products' %}"
+             class="sidebar-all-link {% if not search_query %}active{% endif %}">
+            All Produce <span style="color:#cbd5e1; font-size:1rem;">›</span>
+          </a>
+
+          <!-- Parent categories loop — only roots (parent=None) -->
+          {% for parent in categories %}
+            {% if parent.children.exists %}
+              <!-- Parent HAS children → accordion button -->
+              <button
+                class="parent-cat-btn {% if active_parent_id == parent.id|stringformat:'s' or category_id == parent.id|stringformat:'s' %}open{% endif %}"
+                onclick="toggleCat('cat-{{ parent.id }}', this)">
+                <a href="{% url 'products' %}?search_query={{ parent.name }}&category_id={{ parent.id }}"
+                   class="parent-cat-name-link"
+                   onclick="event.stopPropagation();">
+                  {{ parent.name }}
+                </a>
+                <span class="cat-chevron">›</span>
+              </button>
+
+              <!-- Children sub-list -->
+              <div class="children-list {% if active_parent_id == parent.id|stringformat:'s' or category_id == parent.id|stringformat:'s' %}open{% endif %}"
+                   id="cat-{{ parent.id }}">
+                {% for child in parent.children.all %}
+
+                  {% if child.children.exists %}
+                    <!-- Child also HAS grandchildren -->
+                    <a href="{% url 'products' %}?search_query={{ child.name }}"
+                       class="child-link {% if search_query == child.name %}active{% endif %}">
+                      {{ child.name }}
+                    </a>
+                    {% for grandchild in child.children.all %}
+                    <a href="{% url 'products' %}?search_query={{ grandchild.name }}"
+                       class="grandchild-link {% if search_query == grandchild.name %}active{% endif %}">
+                      {{ grandchild.name }}
+                    </a>
+                    {% endfor %}
+
+                  {% else %}
+                    <!-- Child is a leaf -->
+                    <a href="{% url 'products' %}?search_query={{ child.name }}"
+                       class="child-link {% if search_query == child.name %}active{% endif %}">
+                      {{ child.name }}
+                    </a>
+                  {% endif %}
+
+                {% endfor %}
+              </div>
+
+            {% else %}
+              <!-- Parent has NO children → simple link -->
+              <a href="{% url 'products' %}?search_query={{ parent.name }}"
+                 class="sidebar-all-link {% if search_query == parent.name %}active{% endif %}"
+                 style="border-bottom: 1px solid #f1f5f9; font-weight:500;">
+                {{ parent.name }} <span style="color:#cbd5e1; font-size:1rem;">›</span>
+              </a>
+            {% endif %}
+          {% endfor %}
+
+          {% if search_query %}
+          <div class="sidebar-clear-wrap">
+            <a href="{% url 'products' %}" class="btn-sidebar-clear">✕ Clear Filter</a>
+          </div>
+          {% endif %}
+
+        </div>
+      </aside>
+      <!-- END SIDEBAR -->
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- RIGHT: YOUR ORIGINAL GRID — UNTOUCHED   -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="products-grid-area">
+
+        {% if search_query %}
+        <div style="margin-bottom: 2rem; font-size: 1.6rem; color: #475569;">
+          Showing search results for: <strong>"{{ search_query }}"</strong>
+          <a href="{% url 'products' %}" style="margin-left: 10px; color: #1c5235; text-decoration: underline; font-size: 1.4rem;">Clear Filter</a>
+        </div>
+        {% endif %}
+
+        <div class="marketplace-grid">
+          {% for product in products %}
+          <div class="product-retail-card">
+            <a href="{% url 'single-product' product.id %}" class="product-img-link">
+              <img class="product-img-render" src="{{ product.imageURL }}" alt="{{ product.title }} thumbnail" />
+            </a>
+            <div class="product-details-box">
+              <a href="{% url 'single-product' product.id %}" style="text-decoration: none; color: inherit; display: block; margin: 0 !important; padding: 0 !important;">
+                <h3 class="retail-title" title="{{ product.title }}" style="margin: 0 !important; line-height: 1.2 !important; height: auto !important; max-height: 3.6rem; overflow: hidden;">{{ product.title }}</h3>
+              </a>
+              <p class="retail-farmer" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important;">Farmer: <strong>{{ product.owner.name }}</strong></p>
+              <div class="retail-location-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>{{ product.county|default:"Nairobi" }}</span>
+              </div>
+              {% if product.vote_ratio %}
+              <div class="trust-rating-badge">{{ product.vote_ratio }}% Positive</div>
+              {% else %}
+              <div class="trust-rating-badge" style="background-color: #f1f5f9; color: #64748b;">New Product</div>
+              {% endif %}
+              <div class="retail-tag-strip">
+                {% for category in product.categories.all %}
+                <span class="retail-mini-pill">{{ category.name }}</span>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 0; color: #64748b;">
+            <p style="font-size: 1.8rem; font-weight: 600;">No farm produce found matching your parameters.</p>
+            <a href="{% url 'products' %}" style="color: #1c5235; font-weight: bold; text-decoration: underline;">Clear Search filters</a>
+          </div>
+          {% endfor %}
+        </div>
+
+      </div>
+      <!-- END GRID -->
+
+    </div><!-- end products-layout -->
+
+    {% include 'pagination.html' with queryset=products custom_range=custom_range %}
+  </section>
+</main>
+
+<script>
+  function toggleCat(listId, btn) {
+    var list = document.getElementById(listId);
+    var isOpen = list.classList.contains('open');
+
+    // Close all open panels first
+    document.querySelectorAll('.children-list.open').forEach(function(el) {
+      el.classList.remove('open');
+    });
+    document.querySelectorAll('.parent-cat-btn.open').forEach(function(el) {
+      el.classList.remove('open');
+    });
+
+    // Open this one if it was closed
+    if (!isOpen) {
+      list.classList.add('open');
+      btn.classList.add('open');
+    }
+  }
+
+  // On page load: auto-open the parent whose child matches the active search
+  document.addEventListener('DOMContentLoaded', function() {
+    var activeChild = document.querySelector('.child-link.active, .grandchild-link.active');
+    if (activeChild) {
+      var parentList = activeChild.closest('.children-list');
+      if (parentList) {
+        parentList.classList.add('open');
+        var parentBtn = parentList.previousElementSibling;
+        if (parentBtn && parentBtn.classList.contains('parent-cat-btn')) {
+          parentBtn.classList.add('open');
+        }
+      }
+    }
+  });
+</script>
+
+{% endblock content %}
