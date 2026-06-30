@@ -1,0 +1,38 @@
+
+.metric-total {
+    color: #1e293b;
+}
+
+.metric-buyer {
+    color: #0369a1;
+}
+
+.metric-farmer {
+    color: #1e8a57;
+}
+
+.metric-both {
+    color: #b45309;
+}
+
+.metric-value {
+    font-weight: 700;
+}
+
+.role-badge {
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+}
+
+.badge--buyer {
+    background: #e0f2fe;
+}
+
+.badge--farmer {
+    background: #dcfce7;
+}
+
+.badge--both {
+    background: #ffedd5;
+}
+
