@@ -1,0 +1,70 @@
+<!-- templates/main.html -->
+
+<!DOCTYPE html>
+{% load static %}
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="{% static 'uikit/styles/uikit.css' %}" />
+  <link rel="stylesheet" href="{% static 'styles/app.css' %}" />
+
+  <title>SokoDirect Marketplace</title>
+
+   <script type="text/javascript">
+    var user = '{{request.user}}'
+
+    // SAFE & CLEAN: Passes the token text directly into a JavaScript string variable
+    var csrftoken = '{{ csrf_token }}';
+
+    function def_getCookie(name) {
+        var cookieArr = document.cookie.split(";");
+        for(var i = 0; i < cookieArr.length; i++) {
+            var cookiePair = cookieArr[i].split("=");
+            if(name == cookiePair[0].trim()) {
+                return decodeURIComponent(cookiePair[1]);
+            }
+        }
+        return null;
+    }
+
+    var cart = JSON.parse(def_getCookie('cart'));
+    if (cart == undefined || cart == null){
+        cart = {}
+        console.log('New SokoDirect Browser Cart Created!')
+        document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+    }
+    console.log('Active Session Cart Object State:', cart)
+  </script>
+
+</head>
+
+<body>
+    {% include 'navbar.html' %}
+
+    {% if messages %}
+        <div class="messages-global-wrapper" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px; width: 100%;">
+            {% for message in messages %}
+                <div class="alert alert--{{ message.tags }}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 15px; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <p class="alert__message" style="margin: 0; font-weight: 600;">{{ message }}</p>
+                    <button class="alert__close" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; line-height: 1;">×</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="container-workspace" style="padding-bottom: 0 !important; margin-bottom: 0 !important; min-height: auto !important;">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+    {% include 'footer.html' %}
+
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
+</body>
+</html>
+
