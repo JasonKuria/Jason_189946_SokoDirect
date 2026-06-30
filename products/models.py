@@ -105,6 +105,32 @@ class Product(models.Model):
             return self.featured_image.url
         except:
             return ''
+        
+        #Review model
+class Review(models.Model):
+    VOTE_TYPE = (
+        ('up', 'Upvote'),
+        ('down', 'Downvote'),
+    )
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    body = models.TextField(null=True, blank=True)
+    value = models.CharField(max_length=200, choices=VOTE_TYPE)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
+    created = models.DateTimeField(auto_now_add=True)
+ 
+    class Meta:
+        # Enforces ONE review per owner per product at the database level —
+
+        unique_together = [['owner', 'product']]
+ 
+    def __str__(self):
+        return self.value
+
+
+ 
+
 
 
 
