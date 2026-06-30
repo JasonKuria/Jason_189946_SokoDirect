@@ -1,0 +1,244 @@
+```html
+<!-- templates/navbar.html -->
+
+{% load static %}
+
+<header class="header">
+
+    <div class="navbar-top">
+
+        <div class="container container--narrow navbar-wrapper">
+
+            <!-- Logo -->
+            <a
+                href="{% url 'products' %}"
+                class="header__logo"
+            >
+                <img
+                    src="{% static 'images/GoodLogo01.png' %}"
+                    alt="SokoDirect Logo"
+                >
+            </a>
+
+
+            <!-- Navigation -->
+            <div class="header-center">
+
+                <ul class="header-links">
+
+                    <li>
+                        <a href="{% url 'profiles' %}">
+                            Farmers
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'products' %}">
+                            Products
+                        </a>
+                    </li>
+
+                </ul>
+
+
+                <!-- Search -->
+                <div class="header__search">
+
+                    <form
+                        id="globalSearchForm"
+                        action="{% url 'products' %}"
+                        method="GET"
+                        class="search-form"
+                    >
+
+                        <input
+                            type="text"
+                            name="search_query"
+                            value="{{ search_query|default:'' }}"
+                            placeholder="Search produce..."
+                        >
+
+                        <button type="submit">
+                            Search
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- Right Controls -->
+            <nav class="header__nav">
+
+                <input
+                    type="checkbox"
+                    id="responsive-menu"
+                >
+
+                <label
+                    for="responsive-menu"
+                    class="toggle-menu"
+                >
+                    <span>Menu</span>
+                    <div class="toggle-menu__lines"></div>
+                </label>
+
+
+                <ul class="header__menu">
+
+                    {% if request.user.is_authenticated %}
+
+                    <li>
+
+                        <a
+                            href="{% url 'account' %}"
+                            class="account-btn"
+                        >
+
+                            <span class="account-icon">
+
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    fill="currentColor"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                                </svg>
+
+                            </span>
+
+                            <span>
+
+                                Hi,
+                                {{ request.user.first_name|default:request.user.username|slice:":10" }}
+
+                            </span>
+
+                            <span class="account-arrow">
+                                ▼
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a href="{% url 'inbox' %}">
+                            Inbox
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a
+                            href="{% url 'logout' %}"
+                            class="logout-btn"
+                        >
+                            Logout
+                        </a>
+
+                    </li>
+
+                    {% else %}
+
+                    <li>
+
+                        <a
+                            href="{% url 'login' %}"
+                            class="login-btn"
+                        >
+                            Login / Sign Up
+                        </a>
+
+                    </li>
+
+                    {% endif %}
+
+
+
+                    <li>
+
+                        <a
+                            href="#"
+                            class="cart-btn"
+                        >
+
+                            Cart
+
+                            <span id="cart-count">
+
+                                {{ cartItems|default:"0" }}
+
+                            </span>
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </nav>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Secondary Navigation -->
+    <div class="subheader-bar">
+
+        <div class="container container--narrow subheader-links">
+
+            <a href="#">
+                Home
+            </a>
+
+            |
+
+            <a href="#">
+                FAQ
+            </a>
+
+
+            {% if request.user.first_name %}
+
+            |
+
+            <a href="{% url 'create-product' %}">
+                Post Item / Produce AD
+            </a>
+
+            |
+
+            <a href="{% url 'userdashboard' %}">
+                Farmers / Buyers Dashboard
+            </a>
+
+            |
+
+            <a href="{% url 'orders_dashboard' %}">
+                All Orders
+            </a>
+
+            {% endif %}
+
+            |
+
+            <a href="#">
+                Contact
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
