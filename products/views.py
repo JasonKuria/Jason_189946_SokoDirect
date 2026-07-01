@@ -185,3 +185,21 @@ def manage_categories(request):
     }
     return render(request, 'products/manage-categories.html', context)
 
+def homepage_view(request):
+    return render(request, 'homepage.html')
+ 
+ 
+def contact_view(request):
+    if request.method == 'POST':
+        # Simple: just flash a success message for now
+        # Later you can wire this to send an actual email via Django's send_mail
+        first_name = request.POST.get('first_name', '')
+        messages.success(request, f"Thank you {first_name}! Your message has been received. We'll be in touch within 24 hours.")
+        # To send real email later, add:
+        # from django.core.mail import send_mail
+        # send_mail(subject, message, from_email, [to_email])
+    return render(request, 'contact.html')
+ 
+ 
+def faq_view(request):
+    return render(request, 'faq.html')

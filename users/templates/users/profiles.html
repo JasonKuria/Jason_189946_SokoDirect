@@ -1,0 +1,92 @@
+{% extends 'main.html' %}
+{% block content %}
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'styles/profiles.css' %}" />
+
+<main class="home">
+    
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-section__box">
+                <h2>CONNECT WITH <span>FARMERS</span></h2>
+                <h2>FROM ACROSS KENYA</h2>
+            </div>
+
+            <div class="hero-section__search">
+                <form id="searchForm" action="{% url 'profiles' %}" method="get">
+                    <div class="search-form-wrapper">
+                        <input 
+                            class="search-field-input" 
+                            id="formInput#search" 
+                            type="text" 
+                            name="search_query"
+                            value="{{ search_query|default:'' }}" 
+                            placeholder="Search by farmer name, product type, or produce..." 
+                        />
+                        <button class="search-submit-btn" type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="devlist">
+        <div class="profiles-grid">
+
+            {% for profile in profiles %}
+                <a href="{% url 'user_profile' profile.id %}" class="farmer-card">
+                    <div class="farmer-card__inner">
+                        
+                        <div class="farmer-header-block">
+                            <img class="farmer-avatar" src="{{ profile.imageURL }}" alt="{{ profile.name }} Profile Picture" />
+                            <div class="farmer-meta-details">
+                                <h3 class="farmer-name">{{ profile.name }}</h3>
+                                {% if profile.short_intro %}
+                                    <h5 class="farmer-intro-line">{{ profile.short_intro|slice:"45" }}</h5>
+                                {% endif %}
+                                
+                                {% if profile.county %}
+                                    <div class="location-badge">
+                                        {{ profile.county.name }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <p class="farmer-bio-snippet">
+                            {{ profile.bio|default:"No description provided yet by this grower."|slice:"150" }}
+                        </p>
+                        
+                        <div class="farmer-skills-footer">
+                            {% for speciality in profile.speciality_set.all|slice:"4" %}
+                                <span class="speciality-pill">
+                                    {{ speciality.name }}
+                                </span>
+                            {% empty %}
+                                <span class="speciality-pill" style="background-color: #f1f5f9; color: #64748b;">
+                                    General Producer
+                                </span>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </a>
+            {% empty %}
+                <div class="empty-search-state">
+                    <div class="empty-search-icon">🌾</div>
+                    <h3>No Farmers Found</h3>
+                    <p>We couldn't find matches for "{{ search_query }}". Try searching for alternatives like 'Avocado', 'Dairy', or specific names.</p>
+                </div>
+            {% endfor %}
+
+        </div>
+    </section>
+
+    {% include 'pagination.html' with queryset=profiles custom_range=custom_range %}
+
+</main>
+
+{% endblock content %}
+
+
