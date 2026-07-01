@@ -1,0 +1,134 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  /* 1. Force the navbar container to stay fixed at the top of the viewport */
+  header, .header, .main-navbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 9999 !important; /* Keeps it above all elements */
+  }
+
+  /* 2. Isolated Page Wrapper: 
+    Forces this specific page content area to expand dynamically,
+    clears the top navbar space, and pushes the footer down by force.
+  */
+  .isolated-auth-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10rem !important;   /* Pushes content comfortably below fixed header */
+    padding-bottom: 8rem !important; /* Forces a safe, physical buffer zone above footer */
+    min-height: calc(100vh - 120px); /* Forces view to stay tall enough so footer doesn't ride up */
+    box-sizing: border-box;
+  }
+
+  .auth {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+</style>
+
+<div class="isolated-auth-wrapper">
+              
+{% if page == 'register' %}
+
+   <div class="auth">
+
+      <div class="card">
+
+        <div class="auth__header text-center">
+          <a href="/">
+            <img src="{% static 'images/icon.svg' %}" alt="icon" />
+          </a>
+          <h3>Register an Account</h3>
+          <p>Create a new account</p>
+        </div>
+
+        <form action="{% url 'register' %}" method="POST" class="form auth__form">
+                    {% csrf_token %}
+
+          {% for field in form %}
+            <div class="form__field">
+                <label for="formInput#text">{{field.label}}: </label>
+                {{field}}
+
+                {% for error in field.errors %}
+                  <p style="color: red;">{{error}}</p>
+                {% endfor %}
+            </div>          
+          {% endfor %}
+
+          <div class="auth__actions">
+            <input class="btn btn--sub btn--lg" type="submit" value="Sign In" />
+          </div>
+        </form>
+        
+        <div class="auth__alternative">
+          <p>Already have an Account?</p>
+          <a href="{% url 'login' %}">Log In</a>
+        </div>
+      </div>
+    </div>
+                
+{% else %}
+
+<div class="auth">
+
+    <div class="card">
+
+        <div class="auth__header text-center">
+                    <a href="/">
+                        <img src="{% static 'images/icon.svg' %}" alt="icon" />
+                    </a>
+                    <h3>Account Login</h3>
+                    <p>Welcome Back!</p>
+                    </div>
+
+                    <form action="" method="POST" class="form auth__form">
+                        {% csrf_token %}
+
+                        <div class="form__field">
+                            <label for="formInput#text">Username: </label>
+                            <input
+                            class="input input--text"
+                            id="formInput#text"
+                            type="text"
+                            name="username"
+                            placeholder="Enter your username..."
+                            />
+                        </div>
+
+                        <div class="form__field">
+                            <label for="formInput#password">Password: </label>
+                            <input
+                            class="input input--password"
+                            id="formInput#passowrd"
+                            type="password"
+                            name="password"
+                            placeholder="••••••••"
+                            />
+                        </div>
+                        <div class="auth__actions">
+                            <input class="btn btn--sub btn--lg" type="submit" value="Log In" />
+                            <a href="{% url 'reset_password' %}">Forget Password?</a>
+                        </div>
+                    </form>
+                    
+                    <div class="auth__alternative">
+                    <p>Don’t have an Account?</p>
+                    <a href="{% url 'register' %}">Register</a>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+</div> {% endblock content %}
+
+{% endblock content %}

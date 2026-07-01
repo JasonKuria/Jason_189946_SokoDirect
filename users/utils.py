@@ -6,9 +6,9 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 def paginateProfiles(request, profiles, results):
 
-    page = 1  # Default to the first page
+    page = 1  
     #page = 2 # Get the 'page' parameter from the GET request. If it's not provided, default to 1. This allows users to navigate through different pages of profiles.
-    page = request.GET.get('page', page) # Get the 'page' parameter from the GET request. If it's not provided, default to the value of the 'page' variable (which is 2 in this case). This allows users to navigate through different pages of profiles.
+    page = request.GET.get('page', page) 
     #results = 3 # Number of profiles to display per page
     paginator = Paginator(profiles, results) # Create a Paginator object with the filtered profiles and the number of results per page.
 
@@ -17,22 +17,21 @@ def paginateProfiles(request, profiles, results):
     try:
         profiles = paginator.page(page) # Try to get the profiles for the current page. This will return a subset of the profiles based on the pagination settings.
     except PageNotAnInteger:
-        page = 1 # If the 'page' parameter is not an integer, default to the first page.
-        profiles = paginator.page(page) # Get the profiles for the first page.
+        page = 1 
+        profiles = paginator.page(page) 
     except EmptyPage:
         page = paginator.num_pages # If the 'page' parameter is out of range (e.g., too high), default to the last page.
-        profiles = paginator.page(page) # Get the profiles for the last page.
+        profiles = paginator.page(page)
 
     leftIndex = int(page) - 4 # Calculate the left index for pagination links. This will determine how many page numbers to show before the current page.
     if leftIndex < 1:
-        leftIndex = 1 # Ensure the left index does not go below 1.
+        leftIndex = 1 
     
-    rightIndex = int(page) + 5 # Calculate the right index for pagination links. This will determine how many page numbers to show after the current page.
+    rightIndex = int(page) + 5
     if rightIndex > paginator.num_pages:
-        rightIndex = paginator.num_pages + 1 # Ensure the right index does not go beyond the total number of pages.
+        rightIndex = paginator.num_pages + 1
 
-    custom_range = range(leftIndex, rightIndex) # Create a custom range for pagination links. This can be used in the template to display page numbers for navigation.
-
+    custom_range = range(leftIndex, rightIndex) 
     return profiles, custom_range
 
 def searchProfiles(request):

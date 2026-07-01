@@ -1,0 +1,104 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+  <!-- Main Section -->
+  <main class="settingsPage profile my-md">
+    <div class="container">
+      <div class="layout">
+        <div class="column column--1of3">
+          <div class="card text-center">
+            <div class="card__body dev">
+              <a class="tag tag--pill tag--main settings__btn" href="{% url 'edit-account' %}">
+                <i class="im im-edit"></i> 
+                Edit
+              </a>
+              <img class="avatar avatar--xl dev__avatar" src="{{profile.imageURL}}" />
+              <h2 class="dev__name">{{profile.name}}</h2>
+              <p class="dev__title">{{profile.short_intro}}</p>
+              <p class="dev__location">Based in {{profile.county}}</p>
+              <ul class="dev__social">
+
+                <!-- Social links — only show if farmer has added them -->
+                {% if profile.social_twitter %}
+                    <li><a href="{{ profile.social_twitter }}">Twitter</a></li>
+                {% endif %}
+                {% if profile.whatsapp_link %}
+                    <li><a href="{{ profile.whatsapp_link }}">WhatsApp</a></li>
+                {% endif %}
+                {% if profile.website %}
+                    <li><a href="{{ profile.website }}">Website</a></li>
+                {% endif %}
+
+              </ul>
+             
+            </div>
+          </div>
+        </div>
+        <div class="column column--2of3">
+          <div class="devInfo">
+            <h3 class="devInfo__title">About Me</h3>
+            <p class="devInfo__about">{{profile.bio}}</p>
+          </div>
+          <div class="settings">
+            <h3 class="settings__title">Skills/Specialities</h3>
+            <a class="tag tag--pill tag--sub settings__btn tag--lg" href="{% url 'create-speciality' %}">
+              <i class="im im-plus"></i> 
+              Add Skill
+            </a>
+          </div>
+
+          <table class="settings__table">
+            {% for speciality in specialities %}
+            <tr>
+              <td class="settings__tableInfo">
+                <h4>{{speciality.name}}</h4>
+                <p>{{speciality.description}}</p>
+              </td>
+              <td class="settings__tableActions">
+                <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-speciality' speciality.id %}"><i class="im im-edit"></i> Edit</a>
+                <a class="tag tag--pill tag--main settings__btn" href="{% url 'delete-speciality' speciality.id %}?next=/account"><i class="im im-x-mark-circle-o"></i>
+                  Delete</a>
+              </td>
+            </tr>
+            {% endfor %}
+
+          </table>
+
+          <div class="settings">
+            <h3 class="settings__title">Products</h3>
+            <a class="tag tag--pill tag--sub settings__btn tag--lg" href="{% url 'create-product' %}">
+              <i class="im im-plus"></i> 
+              Add a Product
+            </a>
+          </div>
+
+          <table class="settings__table">
+
+            {% for product in products %}
+            <tr>
+              <td class="settings__thumbnail">
+                <a href="{% url 'single-product' product.id %}">
+                  <img src="{{product.imageURL}}" alt="Project Thumbnail" />
+                </a>
+              </td>
+              <td class="settings__tableInfo">
+                <a href="{% url 'single-product' product.id %}">{{product.title}}</a>
+                <p>{{product.description|slice:"150"}}</p>
+              </td>
+              <td class="settings__tableActions">
+                <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-product' product.id %}"><i class="im im-edit"></i> Edit</a>
+                <a class="tag tag--pill tag--main settings__btn" href="{% url 'delete-product' product.id %}?next=/account"><i class="im im-x-mark-circle-o"></i>
+                  Delete</a>
+              </td>
+            </tr>
+            {% endfor %}
+
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+{% endblock content %}  
+
