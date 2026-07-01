@@ -197,5 +197,5 @@ def orders_dashboard_view(request):
         'total_revenue':  total_revenue,
         'today_count':    today_count,
     }
-    #return render(request, 'orders/orders_dashboard.html', context)
-    return render(request, 'orders/orders_dashboard_v2.html', context)
+    return render(request, 'orders/orders_dashboard.html', context)
+    #return render(request, 'orders/orders_dashboard_v2.html', context)
