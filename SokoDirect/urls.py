@@ -21,13 +21,28 @@ from django.conf.urls.static import static
  
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('products.urls')),  # homepage = product listing for now
-]
- 
+    path('',         homepage_view, name='home'),
+    path('contact/', contact_view,  name='contact'),
+    path('faq/',     faq_view,      name='faq'),   
 
-# Append media URL route — tells Django how to serve uploaded files
-# MEDIA_URL = the URL prefix (/media/)
-# MEDIA_ROOT = the disk folder where files are stored
-# Serve uploaded media files during development
+    # ── App routers ──────────────────────────────────────
+    # Users app - empty string = homepage
+    # path('', include('users.urls')),    
+    path('users/',    include('users.urls')),     
+    path('products/', include('products.urls')),
+    #path('orders/',   include('orders.urls')),    
+    # ── Password reset flow ──────────────────────────
+    path('reset_password/', auth_views.PasswordResetView.as_view(template_name="reset_password.html"), name="reset_password"),
+    path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(template_name="reset_password_sent.html"), name="password_reset_done"),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name="reset.html"), name="password_reset_confirm"),
+    path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(template_name="reset_password_complete.html"), name="password_reset_complete"),
+]
+
+
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# 1 - User submits email for reset  //PasswordResetView.as_view()   //name="reset_password"
+# 2 - Email sent message   //PasswordResetDoneView.as_view() //name="passsword_reset_done"
+# 3 - Email with link and reset instructions  //PasswordResetConfirmView()  //name="password_reset_confirm" 
+# 4 - Password successfully reset message //PasswordResetCompleteView.as_view()  //name="passw
