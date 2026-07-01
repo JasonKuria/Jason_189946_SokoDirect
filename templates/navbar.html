@@ -1,3 +1,5 @@
+<!-- templates/navbar.html -->
+
 {% load static %}
 
 <header class="header" style="background-color: #113821 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-bottom: 3px solid #1e8a57; padding: 0;">
@@ -14,7 +16,7 @@
       <div style="display: flex; align-items: center; gap: 3rem; flex-grow: 1; justify-content: center; max-width: 750px;">
         <ul style="display: flex; align-items: center; gap: 2.5rem; list-style: none; margin: 0; padding: 0; flex-shrink: 0;">
           <li>
-            <a href="" style="color: #f8fafc !important; font-weight: 600; font-size: 1.4rem; text-decoration: none; transition: color 0.2s;">Farmers</a>
+            <a href="{% url 'profiles' %}" style="color: #f8fafc !important; font-weight: 600; font-size: 1.4rem; text-decoration: none; transition: color 0.2s;">Farmers</a>
           </li>
           <li>
             <a href="{% url 'products' %}" style="color: #f8fafc !important; font-weight: 600; font-size: 1.4rem; text-decoration: none; transition: color 0.2s;">Products</a>
@@ -49,7 +51,7 @@
           {% if request.user.is_authenticated %}
             <!-- Combined dynamic click target link matching the exact #284b36 color scheme -->
             <li class="header__menuItem">
-              <a href="" 
+              <a href="{% url 'account' %}" 
                 style="text-decoration: none; 
                         color: #ffffff !important; 
                         background-color: #284b36 !important; 
@@ -77,16 +79,16 @@
               </a>
             </li>
 
-            <li class="header__menuItem"><a href="" style="color: #f8fafc !important; font-weight: 600; font-size: 1.4rem; text-decoration: none;">Inbox</a></li>
+            <li class="header__menuItem"><a href="{% url 'inbox' %}" style="color: #f8fafc !important; font-weight: 600; font-size: 1.4rem; text-decoration: none;">Inbox</a></li>
             
             <!-- Clean Red Logout Button -->
             <li class="header__menuItem">
-              <a href="" class="btn" style="background-color: #b91c1c !important; color: #ffffff !important; padding: 6px 14px; border-radius: 6px; font-size: 1.3rem; font-weight: 600; text-decoration: none; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background 0.2s;" onmouseover="this.style.backgroundColor='#991b1b'" onmouseout="this.style.backgroundColor='#b91c1c'">
+              <a href="{% url 'logout' %}" class="btn" style="background-color: #b91c1c !important; color: #ffffff !important; padding: 6px 14px; border-radius: 6px; font-size: 1.3rem; font-weight: 600; text-decoration: none; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background 0.2s;" onmouseover="this.style.backgroundColor='#991b1b'" onmouseout="this.style.backgroundColor='#b91c1c'">
                 Logout
               </a>
             </li>
           {% else %}
-            <li class="header__menuItem"><a href="" class="btn" style="background-color: #1e8a57 !important; color: white !important; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 1.3rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Login/Sign Up</a></li>  
+            <li class="header__menuItem"><a href="{% url 'login' %}" class="btn" style="background-color: #1e8a57 !important; color: white !important; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 1.3rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Login/Sign Up</a></li>  
           {% endif %}
 
 
@@ -104,7 +106,6 @@
               </a>
           </li>          
           
-
 
 
                     
@@ -155,4 +156,5 @@
     </span>
   </div>
 </header>
+
 
