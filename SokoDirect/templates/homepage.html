@@ -1,0 +1,166 @@
+```html
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="hero">
+
+    <div class="hero-inner">
+
+        <div class="hero-badge">
+            Kenya's Farm-to-Table Marketplace
+        </div>
+
+        <h1>
+            Fresh From
+            <br>
+            <span>Farm to Your Table</span>
+        </h1>
+
+        <p class="hero-sub">
+
+            Connect directly with verified farmers.
+
+            No middlemen. No markups.
+
+            Fresh produce at fair prices.
+
+        </p>
+
+        <div class="hero-cta-row">
+
+            <a
+                href="{% url 'products' %}"
+                class="btn-hero-primary"
+            >
+                Shop Fresh Produce
+            </a>
+
+            <a
+                href="{% url 'profiles' %}"
+                class="btn-hero-outline"
+            >
+                Meet Our Farmers
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<section class="trust-bar">
+
+    <div class="trust-bar-inner">
+
+        <div class="trust-item">
+            Verified Farmers
+        </div>
+
+        <div class="trust-item">
+            Doorstep Delivery
+        </div>
+
+        <div class="trust-item">
+            M-Pesa Payments
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<section class="section">
+
+    <div class="section-inner">
+
+        <div class="section-label">
+            Simple Process
+        </div>
+
+        <h2 class="section-title">
+            How SokoDirect Works
+        </h2>
+
+        <div class="steps-grid">
+
+            <div class="step-card">
+
+                <div class="step-number">
+                    1
+                </div>
+
+                <h3>
+                    Browse
+                </h3>
+
+            </div>
+
+
+            <div class="step-card">
+
+                <div class="step-number">
+                    2
+                </div>
+
+                <h3>
+                    Select
+                </h3>
+
+            </div>
+
+
+            <div class="step-card">
+
+                <div class="step-number">
+                    3
+                </div>
+
+                <h3>
+                    Pay
+                </h3>
+
+            </div>
+
+
+            <div class="step-card">
+
+                <div class="step-number">
+                    4
+                </div>
+
+                <h3>
+                    Receive
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<section class="cta-banner">
+
+    <h2>
+        Ready to get started?
+    </h2>
+
+    <a
+        href="{% url 'register' %}"
+        class="btn-cta-white"
+    >
+        Join SokoDirect Today
+    </a>
+
+</section>
+
+{% endblock content %}
+```

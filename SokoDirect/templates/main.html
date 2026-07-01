@@ -1,0 +1,156 @@
+```html
+<!-- templates/main.html -->
+
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <link
+        rel="shortcut icon"
+        href="{% static 'images/favicon.ico' %}"
+        type="image/x-icon"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'uikit/styles/uikit.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'styles/app.css' %}"
+    >
+
+    <title>SokoDirect Marketplace</title>
+
+    <script>
+
+        const user = "{{ request.user }}";
+        const csrftoken = "{{ csrf_token }}";
+
+
+        function getCookie(name) {
+
+            const cookies = document.cookie.split(';');
+
+            for (let cookie of cookies) {
+
+                let [key, value] = cookie.split('=');
+
+                if (key.trim() === name) {
+                    return decodeURIComponent(value);
+                }
+
+            }
+
+            return null;
+
+        }
+
+
+        let cart = {};
+
+        try {
+
+            cart = JSON.parse(getCookie('cart'));
+
+        } catch {
+
+            cart = {};
+
+        }
+
+
+        if (!cart) {
+
+            cart = {};
+
+            document.cookie =
+                `cart=${JSON.stringify(cart)};path=/`;
+
+            console.log(
+                'New browser cart initialized'
+            );
+
+        }
+
+        console.log(
+            'Current Cart:',
+            cart
+        );
+
+    </script>
+
+</head>
+
+
+<body>
+
+    {% include 'navbar.html' %}
+
+
+    <!-- Global Messages -->
+    {% if messages %}
+
+    <div class="messages-wrapper">
+
+        {% for message in messages %}
+
+        <div class="alert alert--{{ message.tags }}">
+
+            <p class="alert__message">
+                {{ message }}
+            </p>
+
+            <button
+                class="alert__close"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+
+
+    <!-- Main Content -->
+    <main class="container-workspace">
+
+        {% block content %}
+        {% endblock content %}
+
+    </main>
+
+
+
+    {% include 'footer.html' %}
+
+
+
+    <!-- Scripts -->
+    <script src="{% static 'js/app.js' %}"></script>
+
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script src="{% static 'js/cart.js' %}"></script>
+
+</body>
+
+</html>
+```

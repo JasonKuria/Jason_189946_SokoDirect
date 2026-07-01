@@ -1,0 +1,272 @@
+```html
+{% extends 'main.html' %}
+
+{% block content %}
+
+<main class="profile my-md">
+
+    <div class="container">
+
+        <div class="layout">
+
+            <!-- Profile Sidebar -->
+            <div class="column column--1of3">
+
+                <div class="card text-center">
+
+                    <div class="card__body dev">
+
+                        <img
+                            class="avatar avatar--xl"
+                            src="{{ profile.imageURL }}"
+                            alt="{{ profile.name }}"
+                        >
+
+                        <h2 class="dev__name">
+                            {{ profile.name }}
+                        </h2>
+
+                        <p class="dev__title">
+                            {{ profile.short_intro }}
+                        </p>
+
+                        <p class="dev__location">
+                            {{ profile.county }}
+                        </p>
+
+
+                        <ul class="dev__social">
+
+                            {% if profile.social_twitter %}
+                            <li>
+                                <a href="{{ profile.social_twitter }}">
+                                    Twitter
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if profile.whatsapp_link %}
+                            <li>
+                                <a href="{{ profile.whatsapp_link }}">
+                                    WhatsApp
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if profile.website %}
+                            <li>
+                                <a href="{{ profile.website }}">
+                                    Website
+                                </a>
+                            </li>
+                            {% endif %}
+
+                        </ul>
+
+
+                        {% if request.user.is_authenticated %}
+
+                            {% if request.user.profile.id != profile.id %}
+
+                            <a
+                                href="{% url 'create-message' profile.id %}"
+                                class="btn btn--sub btn--lg"
+                            >
+                                Send Message
+                            </a>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Profile Details -->
+            <div class="column column--2of3">
+
+                <div class="devInfo">
+
+                    <h3 class="devInfo__title">
+                        About — {{ profile.name }}
+                    </h3>
+
+                    <p class="devInfo__about">
+                        {{ profile.bio }}
+                    </p>
+
+                </div>
+
+
+                <!-- Specialities -->
+                <div class="devInfo">
+
+                    <h3 class="devInfo__title">
+                        Specialities
+                    </h3>
+
+                    <div class="devInfo__skills">
+
+                        {% for speciality in topSpeciality %}
+
+                        <div class="devSkill">
+
+                            <h4 class="devSkill__title">
+                                {{ speciality.name }}
+                            </h4>
+
+                            <p class="devSkill__info">
+                                {{ speciality.description }}
+                            </p>
+
+                        </div>
+
+                        {% empty %}
+
+                        <p>
+                            No detailed specialities available.
+                        </p>
+
+                        {% endfor %}
+
+
+                        <h3 class="devInfo__subtitle">
+                            Other Specialities
+                        </h3>
+
+                        <div class="devInfo__otherSkills">
+
+                            {% for speciality in otherSpeciality %}
+
+                            <span class="tag tag--pill tag--sub tag--lg">
+                                <small>
+                                    {{ speciality.name }}
+                                </small>
+                            </span>
+
+                            {% empty %}
+
+                            <p>
+                                No additional specialities.
+                            </p>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Products -->
+                <div class="devInfo">
+
+                    <h3 class="devInfo__title">
+                        Products
+                    </h3>
+
+                    <div class="grid grid--two">
+
+                        {% for product in profile.product_set.all %}
+
+                        <div class="column">
+
+                            <div class="card project">
+
+                                <a
+                                    href="{% url 'single-product' product.id %}"
+                                    class="project"
+                                >
+
+                                    <img
+                                        class="project__thumbnail"
+                                        src="{{ product.imageURL }}"
+                                        alt="{{ product.title }}"
+                                    >
+
+                                    <div class="card__body">
+
+                                        <h3 class="project__title">
+                                            {{ product.title }}
+                                        </h3>
+
+                                        <p>
+
+                                            <a
+                                                class="project__author"
+                                                href="{% url 'user_profile' product.owner.id %}"
+                                            >
+                                                By {{ product.owner.name }}
+                                            </a>
+
+                                        </p>
+
+                                        <p class="project--rating">
+
+                                            <span
+                                                style="font-weight:bold;"
+                                            >
+                                                {{ product.vote_ratio }}%
+                                            </span>
+
+                                            Positive Feedback
+
+                                            (
+                                            {{ product.vote_total }}
+                                            Vote{{ product.vote_total|pluralize:"s" }}
+                                            )
+
+                                        </p>
+
+
+                                        <div class="project__tags">
+
+                                            {% for category in product.categories.all %}
+
+                                            <span class="tag tag--pill tag--main">
+
+                                                <small>
+                                                    {{ category }}
+                                                </small>
+
+                                            </span>
+
+                                            {% endfor %}
+
+                                        </div>
+
+                                    </div>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                        {% empty %}
+
+                        <p>
+                            No products available.
+                        </p>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+{% endblock content %}
+

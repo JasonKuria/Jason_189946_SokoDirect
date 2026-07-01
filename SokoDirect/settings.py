@@ -38,11 +38,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Our products
-    'products.apps.ProductsConfig',
-    # Our users
-    'users.apps.UsersConfig',  
 
+     # Our SokoDirect apps:
+    'home.apps.HomeConfig',
+    'about.apps.AboutConfig',
+    'users.apps.UsersConfig',
+    'products.apps.ProductsConfig',
+    'support.apps.SupportConfig',
+    'contact.apps.ContactConfig',
+    'farmer.apps.FarmerConfig',  
+    'buyer.apps.BuyerConfig',    
 ]
 
 MIDDLEWARE = [
