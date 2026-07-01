@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'products.apps.ProductsConfig',
     # Our users
     'users.apps.UsersConfig',  
+    #creation of the orders app
+    'orders.apps.OrdersConfig',  
 
 ]
 
