@@ -1,0 +1,257 @@
+
+    /* --- STICKY / FIXED POSITION HEADER SYSTEM OVERRIDES --- */
+    header, .header, .main-navbar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        z-index: 9999 !important;
+        background-color: #113821 !important; 
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    body {
+        background-color: #f8fafc !important;
+    }
+
+    /* --- CANVAS LAYOUT BASE --- */
+    .home {
+        padding-top: 7rem !important;
+        min-height: 100vh;
+    }
+
+    /* --- HERO DISPLAY & SEARCH MODULE --- */
+    .hero-section {
+        background: linear-gradient(135deg, #113821 0%, #1a4d31 100%);
+        padding: 3rem 2rem;
+        height: auto !important;
+        text-align: center;
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 3rem;
+    }
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background-color: #f1c40f;
+    }
+    .hero-section__box {
+        margin-bottom: 2rem !important;
+    }
+    .hero-section__box h2 {
+        font-size: 3.2rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        margin: 0;
+        text-transform: uppercase;
+        line-height: 1.2;
+    }
+    .hero-section__box h2 span {
+        color: #f1c40f;
+    }
+    .hero-section__box h2 + h2 {
+        font-size: 1.6rem;
+        font-weight: 400;
+        color: #e2e8f0;
+        margin-top: 0.5rem;
+        letter-spacing: 1px;
+    }
+
+    /* Multi-Parameter Search Engine Controls */
+    .hero-section__search {
+        max-width: 750px;
+        margin: 0 auto;
+    }
+    .search-form-wrapper {
+        display: flex;
+        background: #ffffff;
+        padding: 6px;
+        border-radius: 50px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        align-items: center;
+        gap: 10px;
+    }
+    .search-field-input {
+        flex: 1;
+        border: none !important;
+        outline: none !important;
+        padding: 12px 20px !important;
+        font-size: 1.4rem !important;
+        color: #1e293b !important;
+        background: transparent !important;
+    }
+    .search-field-input::placeholder {
+        color: #94a3b8;
+    }
+    
+    /* Integrated Interactive Dropdown Selector Styling */
+    .search-dropdown-filter {
+        border: none;
+        outline: none;
+        background: #f1f5f9;
+        color: #334155;
+        padding: 12px 20px;
+        font-size: 1.35rem;
+        font-weight: 600;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    .search-dropdown-filter:hover {
+        background: #e2e8f0;
+    }
+
+    .search-submit-btn {
+        background-color: #1e8a57 !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 12px 32px !important;
+        font-size: 1.4rem !important;
+        font-weight: 700 !important;
+        border-radius: 50px !important;
+        text-transform: uppercase;
+        cursor: pointer !important;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    .search-submit-btn:hover {
+        background-color: #133a23 !important;
+    }
+
+    /* --- METRICS GRID COMPONENT --- */
+    .metrics-wrapper {
+        max-width: 1200px;
+        margin: 0 auto 3rem auto;
+        padding: 0 2rem;
+    }
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 2rem;
+    }
+    .metric-card {
+        background: #ffffff;
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01), 0 2px 4px -1px rgba(0,0,0,0.01);
+        text-align: center;
+    }
+    .metric-card h3 {
+        font-size: 1.3rem;
+        text-transform: uppercase;
+        color: #64748b;
+        margin: 0 0 8px 0;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+    .metric-card p {
+        font-size: 3.2rem;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1;
+    }
+
+    /* --- DATA WORKSPACE MAIN PANEL --- */
+    .dashboard-list {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem 6rem 2rem;
+    }
+    
+    /* Elegant Tabular Structured Workspace layout */
+    .table-container {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        overflow: hidden;
+    }
+    .soko-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    .soko-table th {
+        background-color: #113821;
+        color: #ffffff;
+        font-size: 1.3rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 16px 24px;
+        letter-spacing: 0.5px;
+    }
+    .soko-table td {
+        padding: 18px 24px;
+        font-size: 1.45rem;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+    .soko-table tr:last-child td {
+        border-bottom: none;
+    }
+    .soko-table tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    /* Custom Status Badges matching SokoDirect profiles metadata tags */
+    .role-badge {
+        display: inline-block;
+        font-size: 1.15rem;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+        text-transform: uppercase;
+    }
+    .badge--buyer { background-color: #e0f2fe; color: #0369a1; border: 1px solid rgba(3, 105, 161, 0.1); }
+    .badge--farmer { background-color: #e8f8f0; color: #1e8a57; border: 1px solid rgba(30, 138, 87, 0.1); }
+    .badge--both { background-color: #fef3c7; color: #b45309; border: 1px solid rgba(180, 83, 9, 0.1); }
+
+    .empty-search-state {
+        text-align: center;
+        padding: 6rem 2rem;
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px dashed #cbd5e1;
+    }
+    .empty-search-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    .empty-search-state h3 {
+        font-size: 1.8rem;
+        color: #113821;
+        margin: 0 0 8px 0;
+    }
+    .empty-search-state p {
+        font-size: 1.4rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    @media screen and (max-width: 768px) {
+        .hero-section__box h2 { font-size: 2.4rem; }
+        .search-form-wrapper {
+            border-radius: 16px;
+            flex-direction: column;
+            padding: 12px;
+        }
+        .search-field-input, .search-dropdown-filter, .search-submit-btn {
+            width: 100%;
+            text-align: center;
+        }
+        .search-dropdown-filter {
+            border-radius: 8px;
+        }
+        .search-submit-btn {
+            border-radius: 8px !important;
+        }
+        .soko-table th, .soko-table td {
+            padding: 12px 16px;
+        }
+    }

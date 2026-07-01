@@ -1,0 +1,305 @@
+{% extends 'main.html' %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'styles/ProductSingle.css' %}" />
+
+<main class="singleProject">
+  <div class="container">
+    
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
+    </div>
+
+    <div class="sokodirect-detail-container">
+      
+      <div class="sokodirect-main-column">
+        <div class="detail-image-box">
+          <img src="{{ product.imageURL }}" alt="{{ product.title }} render image" />
+        </div>
+
+        <h1 class="detail-title-main">{{ product.title }}</h1>
+        
+        <p class="detail-farmer-row">
+          Verified Farmer: <a href="">{{ product.owner.name }}</a>
+        </p>
+
+        <div class="share-strip-wrapper">
+          <span style="font-size: 1.25rem; font-weight: 600; color: #64748b;">Share this product:</span>
+          <a href="https://api.whatsapp.com/send?text=Check out this fresh harvest on SokoDirect: {{ product.title }} - http://127.0.0.1:8000{{ request.path }}" target="_blank" class="share-icon-btn" style="background-color: #25D366;">💬</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=http://127.0.0.1:8000{{ request.path }}" target="_blank" class="share-icon-btn" style="background-color: #1877F2;">f</a>
+          <a href="https://twitter.com/intent/tweet?url=http://127.0.0.1:8000{{ request.path }}&text=Fresh produce available now!" target="_blank" class="share-icon-btn" style="background-color: #000000;">𝕏</a>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 15px 0;" />
+
+        <h3 class="singleProject__subtitle" style="font-size: 1.6rem; margin-bottom: 8px;">Product Description</h3>
+        <div class="singleProject__info" style="font-size: 1.4rem; line-height: 1.6; color: #475569; margin-bottom: 2.5rem;">
+          {{ product.description }}
+        </div>
+
+        <div style="margin-bottom: 3rem;">
+          <h4 style="font-size: 1.3rem; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Marketplace Tags</h4>
+          <div class="singleProject__toolStack" style="display: flex; flex-wrap: wrap; gap: 6px;">
+            {% for category in product.categories.all %}
+            <span class="tag tag--pill tag--sub tag--lg" style="background: #f1f5f9; color: #475569; font-weight: 500;">
+              <small>{{ category.name }}</small>
+            </span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="comments" style="border-top: 1px solid #e2e8f0; padding-top: 20px;">
+          <h3 class="singleProject__subtitle">Customer Feedback & Reviews</h3>
+          <h5 class="project--rating" style="margin-bottom: 15px; color: #2e7d32; background: #e8f8f0; width: fit-content; padding: 4px 10px; border-radius: 4px;">
+            {{ product.vote_ratio }}% Positive Feedback ({{ product.vote_total }} Vote{{ product.vote_total|pluralize:"s" }})
+          </h5>
+
+          {% if request.user.profile.id in product.reviewers %}
+            <p style="font-size: 1.35rem; color: #64748b; font-style: italic;">You have already submitted a review for this product. Thank you for your feedback!</p>
+          {% elif request.user.profile == product.owner %} 
+            <p style="font-size: 1.35rem; color: #ef4444; font-weight: 500;">You cannot review your own listing.</p>
+          {% elif request.user.is_authenticated %}
+            <form class="form" action="{% url 'single-product' product.id %}" method="POST" style="margin-bottom: 20px;">
+              {% csrf_token %}
+              {% for field in form %}
+              <div class="form__field" style="margin-bottom: 10px;">
+                <label style="font-size: 1.3rem; font-weight: 600; color: #475569;">{{ field.label }}</label>
+                {{ field }}
+              </div>
+              {% endfor %}
+              <input class="btn btn--sub btn--lg" type="submit" value="Submit Review" style="background: #1e293b; padding: 8px 16px; font-size: 1.3rem;" />
+            </form>
+          {% else %}
+            <a href="" style="font-size: 1.35rem; color: #3ab54a; font-weight: 600;">Please Login to leave a Review</a>
+          {% endif %}
+
+          <div class="commentList" style="margin-top: 20px;">
+            {% for review in product.review_set.all %}
+            {% if review.body %}  
+            <div class="comment" style="display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
+              <a href="">
+                <img class="avatar avatar--md" src="{{ review.owner.profile_image.url }}" alt="user image avatar" />
+              </a>
+              <div class="comment__details">
+                <a href="" class="comment__author" style="font-size: 1.35rem; font-weight: 600; color: #1e293b;">{{ review.owner.name }}</a>
+                <p class="comment__info" style="font-size: 1.3rem; color: #475569; margin-top: 2px;">{{ review.body|linebreaksbr }}</p>
+              </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="sokodirect-checkout-pane">
+        <h4 style="font-size: 1.2rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; font-weight: 700; letter-spacing: 0.5px;">Retail Price</h4>
+        <p class="pane-price-tag">
+          <span>KES</span> {{ product.price }}
+        </p>
+
+        <div class="sokodirect-stock-metric">
+          {% with total_stock=product.quantity_available|floatformat:"0"|add:"0" %}
+            
+            {% if total_stock <= 0 or not product.quantity_available %}
+              <div class="sokodirect-stock-text stock-out-badge">
+                <span> Out of Stock</span>
+                <span>0 {{ product.unit|default:"units" }} left</span>
+              </div>
+              <div class="sokodirect-stock-bar-bg">
+                <div class="sokodirect-stock-bar-fill stock-bar-critical" style="width: 0%;"></div>
+              </div>
+            {% elif total_stock <= 5 %}
+              <div class="sokodirect-stock-text">
+                <span> Few units left</span>
+                <span>{{ total_stock }} {{ product.unit|default:"units" }} left</span>
+              </div>
+              <div class="sokodirect-stock-bar-bg">
+                <div class="sokodirect-stock-bar-fill stock-bar-critical" style="width: 50%;"></div>
+              </div>
+            {% else %}
+              <div class="sokodirect-stock-text" style="color: #3ab54a;">
+                <span> In Stock</span>
+                <span>{{ total_stock }} {{ product.unit|default:"units" }} available</span>
+              </div>
+              <div class="sokodirect-stock-bar-bg">
+                <div class="sokodirect-stock-bar-fill" style="width: 100%; background-color: #3ab54a;"></div>
+              </div>
+            {% endif %}
+
+          {% endwith %}
+        </div>
+
+        <div class="pane-location-row">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3ab54a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span>Location: <strong>{{ product.county|default:"Nairobi" }}</strong></span>
+        </div>
+
+        <div class="sokodirect-cart-wrapper">
+          {% with total_stock=product.quantity_available|floatformat:"0"|add:"0" %}
+            
+            {% if total_stock > 0 %}
+              <button 
+                id="initial-add-trigger"
+                data-product="{{ product.id }}" 
+                data-action="add" 
+                class="sokodirect-add-initial-btn update-cart"
+                onclick="transitionToCounter(this)">
+                Add To Cart
+              </button>
+
+              <div id="sokodirect-counter-ui" class="sokodirect-qty-counter-unit">
+                <button 
+                  class="counter-control-btn update-cart" 
+                  data-product="{{ product.id }}" 
+                  data-action="remove"
+                  onclick="modifyQuantity(-1)"
+                >
+                  −
+                </button>
+                <span id="counter-value-indicator" class="counter-display-value">1</span>
+                <button 
+                  class="counter-control-btn update-cart" 
+                  data-product="{{ product.id }}" 
+                  data-action="add"
+                  onclick="modifyQuantity(1)"
+                >
+                  +
+                </button>
+              </div>
+            {% else %}
+              <button class="sokodirect-add-initial-btn" style="background-color: #cbd5e1 !important; color: #94a3b8 !important; cursor: not-allowed;" disabled>
+               Out of Stock
+              </button>
+            {% endif %}
+
+          {% endwith %}
+        </div>
+
+        <button id="callback-trigger-btn" class="btn-jiji-callback" onclick="triggerJijiCallback()">
+         Request Call Back
+        </button>
+
+        <div class="jiji-seller-card">
+          <div style="font-weight: 700; font-size: 1.35rem; color: #1e293b; display: flex; justify-content: space-between; align-items: center;">
+            <span> {{ product.owner.name }}</span>
+            <span style="font-size: 1.1rem; padding: 2px 6px; border-radius: 4px; background: #e8f8f0; color: #2e7d32; font-weight: 700;">
+             {% if product.vote_ratio %}{{ product.vote_ratio }}{% else %}100{% endif %}% Score
+            </span>
+          </div>
+          <div class="jiji-seller-meta">
+            Member Since: {{ product.owner.created|date:"d/m/Y"|default:"03/03/2025" }}
+          </div>
+          <div style="margin-top: 10px;">
+            <a href="" style="font-size: 1.2rem; color: #3ab54a; font-weight: 600; text-decoration: none;">
+             View all farmer listings
+            </a>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          
+          <button id="phone-reveal-btn" class="vendor-action-link link--contact" onclick="revealPhoneNumber('{{ product.owner.phone|default:'0712345678' }}')">
+           Click to show number
+          </button>
+
+          <button id="whatsapp-reveal-btn" class="vendor-action-link btn-fmk-whatsapp" 
+                  onclick="revealWhatsApp('{{ product.owner.whatsapp|default:'254712345678' }}', '{{ product.title|escapejs }}')">
+              Click to show WhatsApp
+          </button>
+
+          <a class="vendor-action-link btn-fmk-chat" href="">
+           Message Farmer Directly
+          </a>
+        </div>
+
+        <span class="btn-report-abuse" onclick="triggerReportAbuse()">
+         Report incorrect product information
+        </span>
+
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+          {% if product.contact_link %}
+          <a class="vendor-action-link link--farm" href="{{ product.contact_link }}" target="_blank" style="font-size: 1.2rem !important; padding: 6px;">
+           External Profile Link
+          </a>
+          {% endif %}
+
+          {% if product.farm_link %}
+          <a class="vendor-action-link link--farm" href="{{ product.farm_link }}" target="_blank" style="font-size: 1.2rem !important; padding: 6px;">
+           Farm Operations Link
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+  let runningQty = 0;
+  // This extracts the CharField value, flattens decimal items, and safely handles strings as accurate numbers
+  const maxAvailableStock = parseInt("{{ product.quantity_available|floatformat:"0" }}") || 0;
+
+  // Jumia Incrementor Machine
+  function transitionToCounter(buttonElement) {
+    document.getElementById('initial-add-trigger').style.display = 'none';
+    const counterUI = document.getElementById('jumia-counter-ui');
+    counterUI.style.display = 'flex';
+    
+    runningQty = 1;
+    document.getElementById('counter-value-indicator').innerText = runningQty;
+  }
+
+  function modifyQuantity(delta) {
+    runningQty += delta;
+    
+    if (runningQty > maxAvailableStock) {
+      runningQty = maxAvailableStock;
+      alert(`Sorry, only ${maxAvailableStock} items are currently available.`);
+      return;
+    }
+
+    if (runningQty <= 0) {
+      document.getElementById('jumia-counter-ui').style.display = 'none';
+      document.getElementById('initial-add-trigger').style.display = 'flex';
+      runningQty = 0;
+    } else {
+      document.getElementById('counter-value-indicator').innerText = runningQty;
+    }
+  }
+
+  /* --- AD-LISTING INTERACTION FUNCTIONS --- */
+
+  function triggerJijiCallback() {
+    const btn = document.getElementById('callback-trigger-btn');
+    btn.innerText = "✓ Callback Requested";
+    btn.style.backgroundColor = "#e8f8f0";
+    btn.style.color = "#2e933c";
+    btn.disabled = true;
+    alert("Callback Request received successfully! The farmer will be notified to contact you shortly.");
+  }
+
+  function revealPhoneNumber(realNumber) {
+    const phoneBtn = document.getElementById('phone-reveal-btn');
+    phoneBtn.innerHTML = `📞 ${realNumber}`;
+    phoneBtn.style.backgroundColor = "#475569";
+    phoneBtn.onclick = function() { window.location.href = `tel:${realNumber}`; };
+  }
+
+  function revealWhatsApp(whatsappNumber) {
+    const waBtn = document.getElementById('whatsapp-reveal-btn');
+    waBtn.innerHTML = `✅ Message: ${whatsappNumber}`;
+    waBtn.onclick = function() { 
+      window.open(`https://wa.me/${whatsappNumber}?text=Hi, I am interested in your product listing: {{ product.title }} on SokoDirect.`, '_blank'); 
+    };
+  }
+
+  function triggerReportAbuse() {
+    alert("Thank you for your report. SokoDirect administration workspace moderators have been logged to verify this item's structural specifications and pricing validity.");
+  }
+</script>
+
+{% endblock content %}
