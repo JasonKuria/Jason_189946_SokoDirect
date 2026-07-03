@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
 import os
 from pathlib import Path
 from decouple import config
@@ -21,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m7*s8g_)%-wc=mz$%-=266b!6u#0$@2x5yze2qplyj3g02bt0f'
+SECRET_KEY = 'django-insecure-x9%i(s3g5!uz%)j0_7pl98$j2f+uy@bh8r@orr%sfik3ds1w&5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,9 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Our products
+
+    # Our custom app
     'products.apps.ProductsConfig',
-    # Our users
     'users.apps.UsersConfig',  
     #our payment app
     'payment.apps.PaymentConfig', 
@@ -70,14 +69,16 @@ ROOT_URLCONF = 'SokoDirect.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        #'DIRS': [BASE_DIR / 'templates'],
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],  #  root templates
+        #'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  #  root templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
+                'orders.context_processors.cart_counter',
             ],
         },
     },
@@ -127,17 +128,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
-STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [
-os.path.join(BASE_DIR, 'static')
-]
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Email Configuration for SokoDirect
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
