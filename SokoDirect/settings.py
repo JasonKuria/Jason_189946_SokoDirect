@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from pathlib import Path
-
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'products.apps.ProductsConfig',
     # Our users
     'users.apps.UsersConfig',  
-
+    #our payment app
+    'payment.apps.PaymentConfig', 
 ]
 
 MIDDLEWARE = [
@@ -144,3 +145,12 @@ EMAIL_PORT = '587'
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'jason.kuria@strathmore.edu'
 EMAIL_HOST_PASSWORD = 'ldzapzbuziztfjcb'  # Use environment variable for security
+
+
+
+MPESA_CONSUMER_KEY    = config('MPESA_CONSUMER_KEY')
+MPESA_CONSUMER_SECRET = config('MPESA_CONSUMER_SECRET')
+MPESA_SHORTCODE       = config('MPESA_SHORTCODE')
+MPESA_PASSKEY         = config('MPESA_PASSKEY')
+MPESA_CALLBACK_URL    = config('MPESA_CALLBACK_URL')
+MPESA_ENV             = config('MPESA_ENV', default='sandbox')
