@@ -1,0 +1,80 @@
+{% extends 'main.html' %}
+{% block content %}
+<style>
+.pay-wrap{max-width:640px;margin:4rem auto;padding:0 1.5rem}
+.pay-summary{background:#fff;border:1px solid #e0e0e0;border-radius:.5rem;padding:1.5rem;margin-bottom:1.5rem}
+.pay-summary__label{font-size:1.1rem;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem;font-weight:600}
+.pay-summary__row{display:flex;justify-content:space-between;align-items:center}
+.pay-summary__title{font-size:1.5rem;font-weight:700;color:#1a1a1a}
+.pay-summary__total{font-size:1.8rem;font-weight:800;color:#0e6e36}
+.pay-error{background:#c0392b;color:#fff;padding:1rem 1.2rem;border-radius:.4rem;margin-bottom:1.5rem;font-size:1.35rem;line-height:1.5}
+.pay-section{margin-bottom:1.5rem}
+.pay-section__label{font-size:1.1rem;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.8rem;font-weight:600}
+.pay-method{background:#fff;border:2px solid #e0e0e0;border-radius:.5rem;padding:1.1rem 1.2rem;display:flex;align-items:center;gap:1rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s}
+.pay-method.selected{border-color:#0e6e36}
+.pay-method input[type=radio]{accent-color:#0e6e36;width:18px;height:18px;flex-shrink:0}
+.pay-method__name{font-size:1.4rem;font-weight:500;flex:1}
+.pay-method__logo{font-size:1.3rem;font-weight:800;color:#00a550}
+.pay-phone{background:#fff;border:1px solid #e0e0e0;border-radius:.5rem;padding:1.2rem;margin-bottom:1.5rem}
+.pay-phone label{display:block;font-size:1.2rem;font-weight:600;color:#555;margin-bottom:.5rem}
+.pay-phone input{width:100%;padding:.9rem 1rem;border:1.5px solid #ccc;border-radius:.4rem;font-size:1.5rem;outline:none;transition:border-color .15s}
+.pay-phone input:focus{border-color:#0e6e36}
+.pay-btn{display:block;width:100%;background:#1a6eff;color:#fff;border:none;border-radius:.5rem;padding:1.4rem;font-size:1.6rem;font-weight:700;text-align:center;cursor:pointer;transition:background .2s;letter-spacing:.03em}
+.pay-btn:hover{background:#1355cc}
+.pay-note{text-align:center;font-size:1.15rem;color:#888;margin-top:1rem;line-height:1.6}
+.pay-note a{color:#1a6eff}
+</style>
+
+<div class="pay-wrap">
+
+  <!-- Order Summary -->
+  <div class="pay-summary">
+    <div class="pay-summary__label">Order Summary
+      <a href="{% url 'cart' %}" style="float:right;font-size:1.1rem;color:#1a6eff">SEE DETAILS ></a>
+    </div>
+    <div class="pay-summary__row">
+      <span class="pay-summary__title">TOTAL TO PAY</span>
+      <span class="pay-summary__total">KES {{ order.get_cart_total|floatformat:2 }}</span>
+    </div>
+  </div>
+
+  <!-- Error message (shows after failed payment) -->
+  {% if error %}
+  <div class="pay-error">
+    {{ error }} <a href="#" style="color:#fff;font-weight:700">Contact us</a> for further assistance.
+  </div>
+  {% endif %}
+
+  <form method="POST" action="{% url 'initiate-payment' order.id %}">
+    {% csrf_token %}
+
+    <!-- Payment Method -->
+    <div class="pay-section">
+      <div class="pay-section__label">Choose Payment Method</div>
+      <label class="pay-method selected">
+        <input type="radio" name="payment_method" value="mpesa" checked>
+        <span class="pay-method__name">M-PESA</span>
+        <span class="pay-method__logo">M▶PESA</span>
+      </label>
+    </div>
+
+    <!-- Phone Number -->
+    <div class="pay-phone">
+      <label>M-Pesa Phone Number</label>
+      <input type="tel" name="phone_number" placeholder="e.g. 0712345678" 
+             required maxlength="13" value="{{ request.user.profile.phone|default:'' }}">
+    </div>
+
+    <button type="submit" class="pay-btn">
+      PAY NOW: KES {{ order.get_cart_total|floatformat:2 }}
+    </button>
+
+    <p class="pay-note">
+      By tapping "PAY NOW" you agree to SokoDirect's
+      <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>.<br>
+      We will never ask for your PIN, CVV, or full card details via phone or email.
+    </p>
+  </form>
+
+</div>
+{% endblock content %}

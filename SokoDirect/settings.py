@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # Our custom app
     'products.apps.ProductsConfig',
     'users.apps.UsersConfig',  
+    'orders.apps.OrdersConfig',
     #our payment app
     'payment.apps.PaymentConfig', 
 ]
@@ -127,6 +128,20 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
+# MEDIA_URL: The URL prefix used to access these files in the browser
+# e.g., http://127.0.0.1:8000/media/products/avocado.jpg
+MEDIA_URL = '/media/'
+
+# MEDIA_ROOT: The actual physical path on your computer's hard drive
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 
 # Email Configuration for SokoDirect
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

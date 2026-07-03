@@ -35,7 +35,9 @@ urlpatterns = [
     # path('', include('users.urls')),    
     path('users/',    include('users.urls')),    
     path('products/', include('products.urls')),
-    path('orders/',   include('orders.urls')),    
+    path('orders/',   include('orders.urls')),  
+    #payment pattern urlconfig
+    path('payment/', include('payment.urls')),  
      
 
     path('reset_password/', auth_views.PasswordResetView.as_view(template_name="reset_password.html"), name="reset_password"),
