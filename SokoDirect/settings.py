@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from pathlib import Path
-
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +26,16 @@ SECRET_KEY = 'django-insecure-m7*s8g_)%-wc=mz$%-=266b!6u#0$@2x5yze2qplyj3g02bt0f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.ngrok-free.dev',   # correct wildcard for your current ngrok domain
+    '.ngrok-free.app',
+    '.ngrok.io',
+]
+
 
 
 # Application definition
@@ -38,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
 
      # Our SokoDirect apps:
     #'home.apps.HomeConfig',
@@ -48,6 +58,14 @@ INSTALLED_APPS = [
     'contact.apps.ContactConfig',
     'farmer.apps.FarmerConfig',  
     'buyer.apps.BuyerConfig',    
+=======
+    # Our products
+    'products.apps.ProductsConfig',
+    # Our users
+    'users.apps.UsersConfig',  
+    #our payment app
+    'payment.apps.PaymentConfig', 
+>>>>>>> main
 ]
 
 MIDDLEWARE = [
@@ -140,3 +158,12 @@ EMAIL_PORT = '587'
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'jason.kuria@strathmore.edu'
 EMAIL_HOST_PASSWORD = 'ldzapzbuziztfjcb'  # Use environment variable for security
+
+
+
+MPESA_CONSUMER_KEY    = config('MPESA_CONSUMER_KEY')
+MPESA_CONSUMER_SECRET = config('MPESA_CONSUMER_SECRET')
+MPESA_SHORTCODE       = config('MPESA_SHORTCODE')
+MPESA_PASSKEY         = config('MPESA_PASSKEY')
+MPESA_CALLBACK_URL    = config('MPESA_CALLBACK_URL')
+MPESA_ENV             = config('MPESA_ENV', default='sandbox')
