@@ -1,0 +1,470 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'styles/checkout.css' %}" />
+
+<style>
+  /* Base structural container with top spacing to clear the fixed navigation header */
+  .SokoDirect-checkout-wrapper {
+    padding-top: 0.5rem !important; /* Uniform height match to clear navigation bar */
+    background-color: #f7f9fa;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 4rem;
+  }
+
+  .SokoDirect-checkout-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  /* Left Main Flow: Step-by-step forms */
+  .checkout-main-flow {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .accordion-step-card {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 12px;
+  }
+
+  .step-status-icon {
+    background: #3ab54a;
+    color: #ffffff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+
+  .step-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  /* Form Elements */
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .input-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .input-field-group label {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #475569;
+  }
+
+  .SokoDirect-styled-input {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 1.4rem;
+    color: #1e293b;
+    background-color: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .SokoDirect-styled-input:focus {
+    border-color: #3ab54a;
+    box-shadow: 0 0 0 3px rgba(58, 181, 74, 0.15);
+    outline: none;
+  }
+
+  /* Delivery Details styling matching Good.PNG exactly */
+  .delivery-method-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #ffffff;
+  }
+
+  .delivery-method-option.selected {
+    border-color: #3ab54a;
+    background-color: #f0fdf4;
+    box-shadow: 0 0 0 1px #3ab54a;
+  }
+
+  .radio-circle-input {
+    accent-color: #3ab54a;
+    width: 20px;
+    height: 20px;
+    margin-top: 3px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .delivery-option-text {
+    flex-grow: 1;
+  }
+
+  .delivery-option-text h4 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .delivery-option-text p {
+    font-size: 1.25rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* Payment Blocks styling */
+  .payment-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .payment-method-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #f8fafc;
+  }
+
+  .payment-method-label-text {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #334155;
+  }
+
+  /* Right Sidebar Column matching Good.PNG summary */
+  .checkout-sidebar-summary {
+    width: 360px;
+    position: sticky;
+    top: 12rem; /* Aligns smoothly under fixed navbar on scroll */
+    flex-shrink: 0;
+  }
+
+  .summary-card {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .summary-card-title {
+    font-size: 1.25rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+
+  .summary-manifest-items {
+    max-height: 240px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-right: 4px;
+  }
+
+  /* Custom Webkit scrollbar for premium aesthetic */
+  .summary-manifest-items::-webkit-scrollbar {
+    width: 6px;
+  }
+  .summary-manifest-items::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+  }
+  .summary-manifest-items::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+
+  .manifest-item-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.35rem;
+    color: #475569;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #f1f5f9;
+  }
+
+  .summary-data-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.45rem;
+    color: #475569;
+    margin-bottom: 10px;
+  }
+
+  .summary-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.6rem;
+    color: #1e293b;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 14px;
+    margin-top: 14px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .grand-total-amount {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .btn-SokoDirect-action {
+    display: block;
+    width: 100%;
+    background: #3ab54a !important; /* Matches green CTA brand design rules */
+    color: #ffffff !important;
+    border: none;
+    text-align: center;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(58, 181, 74, 0.2);
+    transition: background-color 0.2s;
+  }
+
+  .btn-SokoDirect-action:hover {
+    background: #2e933c !important;
+  }
+
+  @media screen and (max-width: 950px) {
+    .SokoDirect-checkout-container {
+      flex-direction: column;
+    }
+    .checkout-sidebar-summary {
+      width: 100%;
+      position: static;
+    }
+    .form-grid-2 {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+</style>
+
+<div class="SokoDirect-checkout-wrapper">
+  <div class="SokoDirect-checkout-container">
+    
+    <!-- Left Column: Checkout Inputs Flow -->
+    <div class="checkout-main-flow">
+      <form id="checkout-form" method="POST" action="">
+        {% csrf_token %}
+        
+        <!-- Step 1: Address Details -->
+        <div class="accordion-step-card" id="step-1-card">
+          <div class="step-header">
+            <div class="step-status-icon">1</div>
+            <h3 class="step-title">Customer Address</h3>
+          </div>
+          <div class="step-body-content">
+            <div class="form-grid-2">
+              <div class="input-field-group">
+                <label>County Boundary</label>
+                  <select name="county" class="SokoDirect-styled-input" required>
+                    <option value="">Select County</option>
+                    <option value="Nairobi" {% if shipping_address.county == 'Nairobi' %}selected{% endif %}>Nairobi</option>
+                    <option value="Kiambu" {% if shipping_address.county == 'Kiambu' %}selected{% endif %}>Kiambu</option>
+                  </select>
+              </div>
+              <div class="input-field-group">
+                <label>Town / City</label>
+                  <select name="city" class="SokoDirect-styled-input" required>
+                    <option value="">Select City/Town</option>
+                    <option value="Nairobi Central" {% if shipping_address.city == 'Nairobi Central' %}selected{% endif %}>Nairobi Central</option>
+                    <option value="Thika" {% if shipping_address.city == 'Thika' %}selected{% endif %}>Thika</option>
+                  </select>
+              </div>
+            </div>
+
+            <div class="input-field-group">
+              <label>Delivery Physical Address</label>
+                <input type="text" name="address" value="{{ shipping_address.address|default:'' }}" class="SokoDirect-styled-input" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Delivery Config -->
+        <div class="accordion-step-card" style="margin-top:16px;">
+          <div class="step-header">
+            <div class="step-status-icon">2</div>
+            <h3 class="step-title">Delivery Details</h3>
+          </div>
+          <div class="step-body-content">
+            
+            <label class="delivery-method-option">
+              <input type="radio" name="delivery_method" value="pickup" class="radio-circle-input">
+              <div class="delivery-option-text">
+                <h4>Pick-up Station <span style="color:#3ab54a; font-size:0.95rem; font-weight:700; margin-left:6px;">FROM KES 150</span></h4>
+                <p>Ready for collection between 1 to 2 business days from preferred distribution depot.</p>
+              </div>
+            </label>
+
+            <label class="delivery-method-option selected">
+              <input type="radio" name="delivery_method" value="door" class="radio-circle-input" checked>
+              <div class="delivery-option-text">
+                <h4>Direct Doorstep Delivery <span style="color:#3ab54a; font-size:0.95rem; font-weight:700; margin-left:6px;">FROM KES 350</span></h4>
+                <p>Fresh items sourced straight from farms and optimized routes directly to your space.</p>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- Step 3: Payment Modes -->
+        <div class="accordion-step-card" style="margin-top:16px;">
+          <div class="step-header">
+            <div class="step-status-icon">3</div>
+            <h3 class="step-title">Payment Method</h3>
+          </div>
+          <div class="step-body-content">
+            <div class="input-field-group" style="max-width: 450px;">
+              <label>M-Pesa Registered Contact Line</label>
+              <input type="text" name="phone" value="{{ shipping_address.phone_number|default:request.user.profile.phone|default:'' }}" class="SokoDirect-styled-input" required>              
+            </div>
+
+            <div class="payment-options-list">
+              <div class="payment-method-item">
+                <input type="radio" name="payment_mode" value="mpesa" class="radio-circle-input" checked>
+                <span class="payment-method-label-text">Lipa na M-Pesa (STK Push Trigger instantly)</span>
+              </div>
+              <div class="payment-method-item" style="opacity: 0.6;">
+                <input type="radio" name="payment_mode" value="cod" class="radio-circle-input" disabled>
+                <span class="payment-method-label-text">Pay on Delivery (Disabled for fresh high-value logistics)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="hidden-checkout-trigger" style="display:none;"></button>
+      </form>
+    </div>
+
+    <!-- Right Sidebar Column: Order Calculation Card Summary -->
+    <div class="checkout-sidebar-summary">
+      <div class="summary-card">
+        <h3 class="summary-card-title">Order Summary</h3>
+        
+        <!-- Interactive scrollable items sub-list -->
+        <div class="summary-manifest-items">
+          {% for item in items %}
+          <div class="manifest-item-line">
+            <div style="max-width:70%;">
+              <span style="color:#1e293b; font-weight:600; display:block; font-size: 1.35rem;">{{ item.product.title }}</span>
+              <span style="font-size:1.15rem; color:#64748b;">Qty: {{ item.quantity|floatformat:"0" }} units</span>
+            </div>
+            <span style="font-weight:600; color:#1e293b; font-size: 1.35rem;">KES {{ item.get_total|floatformat:2 }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="summary-data-row">
+          <span>Items Total ({{ order.get_cart_items|floatformat:"0" }})</span>
+          <span style="font-weight:600; color:#1e293b;">KES {{ order.get_cart_total|floatformat:2 }}</span>
+        </div>
+
+        <div class="summary-data-row">
+          <span>Delivery logistics fee</span>
+          <span style="color:#3ab54a; font-weight:600;">Calculated at step</span>
+        </div>
+
+        <div class="summary-total-row">
+          <span style="font-weight:600; color:#1e293b;">Total Payable</span>
+          <span class="total-price-text">KES {{ order.get_cart_total|floatformat:2 }}</span>
+        </div>
+
+        <button type="button" onclick="triggerFormSubmission();" class="btn-SokoDirect-action">
+          Confirm Order
+        </button>
+      </div>
+
+      <div style="margin-top: 12px; font-size: 1.1rem; color: #75757a; text-align: center; padding: 0 8px; line-height: 1.4;">
+        By continuing, you agree to the marketplace logistics platform terms of utilization.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  /**
+   * Links external summary panel action triggers smoothly back into the active programmatic form layer
+   */
+  function triggerFormSubmission() {
+    const hiddenTrigger = document.getElementById('hidden-checkout-trigger');
+    if (hiddenTrigger) {
+      hiddenTrigger.click();
+    }
+  }
+
+  // Intercepts radio configurations to visually style selections inline dynamically
+  document.querySelectorAll('input[name="delivery_method"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      document.querySelectorAll('.delivery-method-option').forEach(el => el.classList.remove('selected'));
+      if (this.checked) {
+        this.closest('.delivery-method-option').classList.add('selected');
+      }
+    });
+  });
+</script>
+
+{% endblock content %}

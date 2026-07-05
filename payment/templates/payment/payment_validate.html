@@ -1,0 +1,52 @@
+{% extends 'main.html' %}
+{% block content %}
+<style>
+.validate-wrap{max-width:560px;margin:6rem auto;padding:0 1.5rem;text-align:center}
+.validate-dots{display:flex;justify-content:center;gap:.6rem;margin-bottom:2.5rem}
+.validate-dot{width:12px;height:12px;border-radius:50%;background:#1a6eff;animation:bounce 1.2s infinite ease-in-out}
+.validate-dot:nth-child(2){animation-delay:.2s}
+.validate-dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+.validate-title{font-size:2rem;font-weight:700;color:#1a1a1a;margin-bottom:.6rem}
+.validate-sub{font-size:1.35rem;color:#888;line-height:1.6;margin-bottom:2rem}
+.validate-card{background:#fff;border:1px solid #e0e0e0;border-radius:.5rem;padding:1.5rem 2rem;font-size:1.35rem;color:#444;line-height:1.7;text-align:left}
+.validate-card strong{color:#1a1a1a}
+</style>
+
+<div class="validate-wrap">
+  <div class="validate-dots">
+    <div class="validate-dot"></div>
+    <div class="validate-dot"></div>
+    <div class="validate-dot"></div>
+  </div>
+
+  <h2 class="validate-title">We are waiting for you</h2>
+  <p class="validate-sub">
+    Please follow the instructions and do not refresh or leave this page.<br>
+    This may take up to 2 minutes.
+  </p>
+
+  <div class="validate-card">
+    A prompt has been sent to <strong>{{ payment.phone_number }}</strong>.<br>
+    Enter your <strong>M-Pesa PIN</strong> to authorize the payment of
+    <strong>KES {{ payment.amount|floatformat:2 }}</strong>.
+  </div>
+</div>
+
+<!-- Poll every 3 seconds to check if payment completed -->
+<script>
+const interval = setInterval(() => {
+  fetch("{% url 'payment-status' %}")
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'success') {
+        clearInterval(interval);
+        window.location.href = "{% url 'order-success' %}";
+      } else if (data.status === 'failed' || data.status === 'cancelled') {
+        clearInterval(interval);
+        window.location.href = "{% url 'payment-page' payment.order.id %}";
+      }
+    });
+}, 3000);
+</script>
+{% endblock content %}
