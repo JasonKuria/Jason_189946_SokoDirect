@@ -7,6 +7,8 @@ from django.dispatch import receiver
 
 from django.contrib.auth.models import User # Django's built-in User model
 from .models import Profile # import the Profile model to create a profile when a user is created
+from django.template.loader import render_to_string 
+from django.utils.html import strip_tags
 
 from django.core.mail import send_mail
 from django.conf import settings
@@ -32,13 +34,44 @@ def CreateProfile(sender, instance, created, **kwargs):
         subject = 'Welcome to SokoDirect'
         message = 'We are glad you are here!!'
 
+        html_message = f"""
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #2c3e50;">Welcome to SokoDirect!</h2>
+            <p>Hi <strong>{profile.name}</strong>,</p>
+            <p>We're thrilled to have you as part of our community. Your account has been successfully created and you're all set to start using SokoDirect MarketPlace.</p>
+            
+            <div style="background-color: #f4f4f4; padding: 15px; border-radius: 5px; text-align: center;">
+                <p style="margin: 0;"><strong>Your Login Email:</strong></p>
+                <p style="font-size: 1.2em; color: #27ae60; margin: 5px 0;">{profile.email}</p>
+            </div>
+
+            <p>If you didn't create this account, please contact our support team immediately.</p>
+            
+            <br>
+            <p>Best regards,<br>
+            <strong>The SokoDirect Team</strong></p>
+            <hr style="border: 0; border-top: 1px solid #eee;">
+            <p style="font-size: 0.8em; color: #888;">Powered by SokoDirect MarketPlace</p>
+        </div>
+        """
+        
+        # Plain text fallback (essential for email clients that don't render HTML)
+        plain_message = strip_tags(html_message)
+
+        # 3. Send the mail
         send_mail(
-            subject,
-            message,
-            settings.EMAIL_HOST_USER,
-            [profile.email],
+            subject=subject,
+            message=plain_message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[profile.email],
+            html_message=html_message,
             fail_silently=False,
         )
+
+
+
+       
+       
 
 def updateUser(sender, instance, created, **kwargs):
     profile = instance 

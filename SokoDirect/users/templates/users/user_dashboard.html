@@ -1,0 +1,295 @@
+```html
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<link
+    rel="stylesheet"
+    href="{% static 'styles/userDash.css' %}"
+>
+
+<main class="home">
+
+    <!-- Hero -->
+    <section class="hero-section">
+
+        <div class="container">
+
+            <div class="hero-section__box">
+
+                <h2>
+                    SOKODIRECT
+                    <span>DASHBOARD</span>
+                </h2>
+
+                <h2>
+                    INTERNAL USER PLATFORM ECOSYSTEM
+                </h2>
+
+            </div>
+
+
+            <!-- Filters -->
+            <div class="hero-section__search">
+
+                <form
+                    id="filterForm"
+                    method="GET"
+                >
+
+                    <div class="search-form-wrapper">
+
+                        <input
+                            class="search-field-input"
+                            type="text"
+                            name="search_query"
+                            value="{{ search_query|default:'' }}"
+                            placeholder="Search accounts by name, username or email..."
+                        >
+
+                        <select
+                            name="role_filter"
+                            class="search-dropdown-filter"
+                            onchange="this.form.submit()"
+                        >
+
+                            <option value="">
+                                All Account Classes
+                            </option>
+
+                            <option
+                                value="buyer_only"
+                                {% if role_filter == 'buyer_only' %}
+                                selected
+                                {% endif %}
+                            >
+                                Buyers Only
+                            </option>
+
+                            <option
+                                value="farmer_only"
+                                {% if role_filter == 'farmer_only' %}
+                                selected
+                                {% endif %}
+                            >
+                                Farmers Only
+                            </option>
+
+                            <option
+                                value="both"
+                                {% if role_filter == 'both' %}
+                                selected
+                                {% endif %}
+                            >
+                                Farmer & Buyer
+                            </option>
+
+                        </select>
+
+                        <button
+                            class="search-submit-btn"
+                            type="submit"
+                        >
+                            Filter
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- Metrics -->
+    <section class="metrics-wrapper">
+
+        <div class="metrics-grid">
+
+            <div class="metric-card">
+
+                <h3>Total Directory Accounts</h3>
+
+                <p class="metric-value metric-total">
+                    {{ total_users_count }}
+                </p>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <h3>Buyers Only</h3>
+
+                <p class="metric-value metric-buyer">
+                    {{ buyers_only_count }}
+                </p>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <h3>Farmers Only</h3>
+
+                <p class="metric-value metric-farmer">
+                    {{ farmers_only_count }}
+                </p>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <h3>Active Across Both Roles</h3>
+
+                <p class="metric-value metric-both">
+                    {{ both_count }}
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- User Table -->
+    <section class="dashboard-list">
+
+        <div class="table-container">
+
+            {% if profiles %}
+
+            <table class="soko-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for profile in profiles %}
+
+                    <tr>
+
+                        <td>
+
+                            <a
+                                href="{% url 'user_profile' profile.id %}"
+                            >
+
+                                <strong>
+                                    {{ profile.name|default:"Name Unset" }}
+                                </strong>
+
+                            </a>
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{% url 'user_profile' profile.id %}"
+                            >
+
+                                @{{ profile.username|default:"-" }}
+
+                            </a>
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{% url 'user_profile' profile.id %}"
+                            >
+
+                                {{ profile.email|default:"No verified email" }}
+
+                            </a>
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{% url 'user_profile' profile.id %}"
+                            >
+
+                                {% if profile.is_farmer and profile.is_buyer %}
+
+                                <span class="role-badge badge--both">
+                                    Farmer & Buyer
+                                </span>
+
+                                {% elif profile.is_farmer %}
+
+                                <span class="role-badge badge--farmer">
+                                    Farmer Only
+                                </span>
+
+                                {% else %}
+
+                                <span class="role-badge badge--buyer">
+                                    Buyer Only
+                                </span>
+
+                                {% endif %}
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <div class="empty-search-state">
+
+                <div class="empty-search-icon">
+                    Search
+                </div>
+
+                <h3>
+                    No Registry Profiles Found
+                </h3>
+
+                <p>
+                    No platform accounts matched your search criteria.
+                    Try changing filters or broadening your query.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+</main>
+
+{% endblock content %}
+
