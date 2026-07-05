@@ -193,7 +193,7 @@
             Member Since: {{ product.owner.created|date:"d/m/Y"|default:"03/03/2025" }}
           </div>
           <div style="margin-top: 10px;">
-            <a href="" style="font-size: 1.2rem; color: #3ab54a; font-weight: 600; text-decoration: none;">
+            <a href="{% url 'user_profile' product.owner.id %}" style="font-size: 1.2rem; color: #3ab54a; font-weight: 600; text-decoration: none;">
              View all farmer listings
             </a>
           </div>

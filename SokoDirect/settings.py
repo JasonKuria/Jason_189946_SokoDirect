@@ -9,8 +9,13 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
 import os
+from dotenv import load_dotenv
+from decouple import config
+
+# Load the .env file
+load_dotenv()
+
 from pathlib import Path
 from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m7*s8g_)%-wc=mz$%-=266b!6u#0$@2x5yze2qplyj3g02bt0f'
+SECRET_KEY = 'django-insecure-x9%i(s3g5!uz%)j0_7pl98$j2f+uy@bh8r@orr%sfik3ds1w&5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -35,7 +40,13 @@ ALLOWED_HOSTS = [
     '.ngrok-free.app',
     '.ngrok.io',
 ]
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ngrok-free.dev',   
+    'https://*.ngrok-free.app',
+    'https://*.ngrok.io',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 
 # Application definition
@@ -47,25 +58,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
 
-     # Our SokoDirect apps:
-    #'home.apps.HomeConfig',
-    #'about.apps.AboutConfig',
-    'users.apps.UsersConfig',
+    # Our custom app
     'products.apps.ProductsConfig',
-    'support.apps.SupportConfig',
-    'contact.apps.ContactConfig',
-    'farmer.apps.FarmerConfig',  
-    'buyer.apps.BuyerConfig',    
-=======
-    # Our products
-    'products.apps.ProductsConfig',
-    # Our users
     'users.apps.UsersConfig',  
+    'orders.apps.OrdersConfig',
     #our payment app
     'payment.apps.PaymentConfig', 
->>>>>>> main
 ]
 
 MIDDLEWARE = [
@@ -83,14 +82,16 @@ ROOT_URLCONF = 'SokoDirect.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        #'DIRS': [BASE_DIR / 'templates'],
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],  #  root templates
+        #'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  #  root templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
+                'orders.context_processors.cart_counter',
             ],
         },
     },
@@ -139,18 +140,21 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-os.path.join(BASE_DIR, 'static')
+    os.path.join(BASE_DIR, 'static')
 ]
+
+# MEDIA_URL: The URL prefix used to access these files in the browser
+# e.g., http://127.0.0.1:8000/media/products/avocado.jpg
 MEDIA_URL = '/media/'
+
+# MEDIA_ROOT: The actual physical path on your computer's hard drive
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
 # Email Configuration for SokoDirect
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
