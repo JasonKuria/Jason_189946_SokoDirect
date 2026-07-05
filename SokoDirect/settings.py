@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
      # Our SokoDirect apps:
-    'home.apps.HomeConfig',
-    'about.apps.AboutConfig',
+    #'home.apps.HomeConfig',
+    #'about.apps.AboutConfig',
     'users.apps.UsersConfig',
     'products.apps.ProductsConfig',
     'support.apps.SupportConfig',
