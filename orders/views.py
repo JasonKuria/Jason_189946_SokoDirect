@@ -65,6 +65,64 @@ def checkout_view(request):
     }
     return render(request, 'orders/checkout.html', context)
 
+
+
+
+
+@login_required
+def checkout(request):
+    # Get or create the current open order for this user
+    order, created = Order.objects.get_or_create(
+        customer=request.user,
+        complete=False
+    )
+    items = order.orderitem_set.all()
+
+    # Get existing shipping address if any
+    shipping_address = ShippingAddress.objects.filter(
+        customer=request.user,
+        order=order
+    ).first()
+
+    if request.method == 'POST':
+        # Collect form data
+        address  = request.POST.get('address', '').strip()
+        city     = request.POST.get('city', '').strip()
+        county   = request.POST.get('county', '').strip()
+        phone    = request.POST.get('phone', '').strip()
+
+        # Validate — make sure nothing is empty
+        if not all([address, city, county, phone]):
+            messages.error(request, 'Please fill in all delivery details.')
+            return render(request, 'orders/checkout.html', {
+                'order': order,
+                'items': items,
+                'shipping_address': shipping_address,
+            })
+
+        # Save or update the shipping address
+        ShippingAddress.objects.update_or_create(
+            customer=request.user,
+            order=order,
+            defaults={
+                'address':      address,
+                'city':         city,
+                'county':       county,
+                'phone_number': phone,
+            }
+        )
+
+        # ✅ Redirect to the payment page passing the order id
+        return redirect('payment-page', order_id=order.id)
+
+    # GET request — just show the checkout page
+    context = {
+        'order':            order,
+        'items':            items,
+        'shipping_address': shipping_address,
+    }
+    return render(request, 'orders/checkout.html', context)
+
 def payment_success_view(request):
     return render(request, 'orders/success.html')
 

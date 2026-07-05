@@ -8,4 +8,6 @@ urlpatterns = [
     path('payment/status/',              views.check_payment_status, name='payment-status'),
     path('payment/callback/',            views.mpesa_callback,       name='mpesa-callback'),
     path('order/success/',               views.order_success,        name='order-success'),
+    
+
 ]

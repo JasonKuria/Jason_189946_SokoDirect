@@ -10,6 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
+from dotenv import load_dotenv
+from decouple import config
+
+# Load the .env file
+load_dotenv()
+
 from pathlib import Path
 from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -34,7 +40,13 @@ ALLOWED_HOSTS = [
     '.ngrok-free.app',
     '.ngrok.io',
 ]
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ngrok-free.dev',   
+    'https://*.ngrok-free.app',
+    'https://*.ngrok.io',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 
 # Application definition

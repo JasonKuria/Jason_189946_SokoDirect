@@ -119,6 +119,9 @@ def mpesa_callback(request):
 
 
 
+@login_required
 def order_success(request):
-    # This view renders the page after a successful transaction
-    return render(request, 'payment/order_success.html')
+    payment_id = request.session.get('payment_id')
+    payment = get_object_or_404(Payment, id=payment_id, status='success')
+    return render(request, 'payment/order_success.html', {'payment': payment})
+

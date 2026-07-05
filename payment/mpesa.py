@@ -3,6 +3,7 @@ import base64
 from datetime import datetime
 from django.conf import settings
 
+
 def get_mpesa_access_token():
     """Get OAuth token from Safaricom."""
     if settings.MPESA_ENV == 'sandbox':
@@ -16,6 +17,7 @@ def get_mpesa_access_token():
     )
     return response.json().get('access_token')
 
+
 def generate_password():
     """Generate the M-Pesa password (base64 of shortcode+passkey+timestamp)."""
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -23,9 +25,7 @@ def generate_password():
     password = base64.b64encode(raw.encode()).decode()
     return password, timestamp
 
-# Temporarily add this at the top of stk_push() to verify
-print(f"DEBUG → PASSKEY length: {len(settings.MPESA_PASSKEY)}")
-print(f"DEBUG → PASSKEY starts with: {settings.MPESA_PASSKEY[:10]}")
+
 def stk_push(phone_number, amount, order_id):
     """
     Send STK Push request to Safaricom.
@@ -33,6 +33,10 @@ def stk_push(phone_number, amount, order_id):
     amount: integer KES amount
     order_id: your order reference
     """
+    # Moved inside the function where it executes per request
+    print(f"DEBUG → PASSKEY length: {len(settings.MPESA_PASSKEY)}")
+    print(f"DEBUG → PASSKEY starts with: {settings.MPESA_PASSKEY[:10]}")
+
     access_token = get_mpesa_access_token()
     password, timestamp = generate_password()
 
@@ -57,13 +61,10 @@ def stk_push(phone_number, amount, order_id):
         'TransactionDesc':   f'SokoDirect Payment for Order {order_id}',
     }
 
-    # Debug — print the full payload before sending
     print(f"DEBUG → STK Push payload: {payload}")
 
     response = requests.post(url, json=payload, headers=headers)
-    return response.json()
+    result = response.json() # Save to variable first
 
-    # Debug — print the full Safaricom response
-    print(f"DEBUG → Safaricom raw response: {result}")
-
+    print(f"DEBUG → Safaricom raw response: {result}") # Now this will print!
     return result
