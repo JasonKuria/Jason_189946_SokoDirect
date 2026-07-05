@@ -1,0 +1,56 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .success-wrapper {
+    padding-top: 4rem;
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: #f7f9fa;
+  }
+
+  .success-card {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 40px;
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+
+  .success-icon {
+    font-size: 4rem;
+    color: #3ab54a;
+    margin-bottom: 20px;
+  }
+
+  h2 { font-size: 2rem; color: #1e293b; margin-bottom: 12px; }
+  p { font-size: 1.3rem; color: #64748b; margin-bottom: 30px; }
+
+  .btn-home {
+    display: inline-block;
+    background: #3ab54a;
+    color: #ffffff;
+    padding: 12px 30px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+</style>
+
+<div class="success-wrapper">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <h2>Order Confirmed!</h2>
+    <p>Thank you for shopping with SokoDirect. Your order has been placed successfully and our farmers are now preparing your produce for dispatch.</p>
+    <a href="{% url 'products' %}" class="btn-home">Continue Shopping</a>
+  </div>
+</div>
+
+{% endblock content %}

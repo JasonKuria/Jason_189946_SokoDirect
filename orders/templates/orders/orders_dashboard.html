@@ -1,0 +1,789 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .dash-root {
+    background: #f0f4f1;
+    min-height: 100vh;
+    padding: 2.4rem 2rem 4rem;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .dash-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* ── Page header ── */
+  .dash-topbar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    margin-bottom: 2.4rem;
+  }
+
+  .dash-title-block h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #0d1f13;
+    letter-spacing: -0.5px;
+    margin: 0 0 4px;
+    line-height: 1;
+  }
+
+  .dash-title-block p {
+    font-size: 1.25rem;
+    color: #1e8a57;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .dash-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-export-csv {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #1e8a57;
+    color: #fff !important;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .btn-export-csv:hover { background: #166534; }
+
+  .last-refresh {
+    font-size: 1.15rem;
+    color: #64748b;
+  }
+  .last-refresh span { color: #1e8a57; font-weight: 600; }
+
+  /* ── Stat cards ── */
+  .dash-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .stat-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 12px 12px 0 0;
+  }
+  .stat-card.green::before  { background: #1e8a57; }
+  .stat-card.amber::before  { background: #f1c40f; }
+  .stat-card.blue::before   { background: #3b82f6; }
+  .stat-card.purple::before { background: #a855f7; }
+
+  .stat-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 1.1rem;
+    color: #94a3b8;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-value.kes { font-size: 1.75rem; }
+
+  .stat-sub {
+    font-size: 1.1rem;
+    color: #94a3b8;
+  }
+
+  /* ── Toolbar ── */
+  .dash-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.4rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-pill-group {
+    display: flex;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 4px;
+    gap: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .filter-pill {
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #64748b;
+    text-decoration: none;
+    transition: all 0.15s;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  .filter-pill:hover { color: #1e8a57; background: #f0fdf4; }
+  .filter-pill.active { background: #1e8a57; color: #fff; }
+
+  .dash-search {
+    flex: 1;
+    max-width: 320px;
+    display: flex;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: border-color 0.2s;
+  }
+  .dash-search:focus-within { border-color: #1e8a57; }
+
+  .dash-search input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 9px 14px;
+    font-size: 1.3rem;
+    color: #0f172a;
+    outline: none;
+  }
+  .dash-search input::placeholder { color: #cbd5e1; }
+
+  .dash-search button {
+    background: #f8fafc;
+    border: none;
+    border-left: 1px solid #e2e8f0;
+    padding: 0 14px;
+    color: #1e8a57;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .dash-search button:hover { background: #f0fdf4; }
+
+  .dash-result-count {
+    margin-left: auto;
+    font-size: 1.2rem;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  /* ── Table card ── */
+  .dash-table-wrap {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  table.dash-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .dash-table thead tr {
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .dash-table th {
+    padding: 12px 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .dash-table tbody tr.order-main-row {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.12s;
+    cursor: pointer;
+  }
+  .dash-table tbody tr.order-main-row:hover { background: #f8fff9; }
+  .dash-table tbody tr.order-main-row.expanded { background: #f0fdf4; border-bottom: none; }
+
+  .dash-table td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    font-size: 1.3rem;
+    color: #475569;
+  }
+
+  /* Expand icon */
+  .expand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    font-size: 1rem;
+    color: #94a3b8;
+    transition: transform 0.2s, background 0.2s;
+    flex-shrink: 0;
+  }
+  .expanded .expand-icon {
+    transform: rotate(180deg);
+    background: #dcfce7;
+    color: #1e8a57;
+  }
+
+  /* Order ID */
+  .order-id-cell {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    color: #1e8a57;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .txn-snippet {
+    font-size: 1.05rem;
+    color: #cbd5e1;
+    font-family: monospace;
+    margin-top: 2px;
+  }
+
+  /* Customer */
+  .customer-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #dcfce7;
+    border: 2px solid #1e8a57;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: #1e8a57;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .customer-cell { display: flex; align-items: center; gap: 10px; }
+  .customer-name { font-weight: 700; color: #0f172a; font-size: 1.3rem; }
+  .customer-username { font-size: 1.1rem; color: #94a3b8; }
+
+  /* Items pill */
+  .items-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 1.15rem;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .amount-cell { font-weight: 700; color: #0f172a; font-size: 1.35rem; }
+
+  .county-tag { font-size: 1.2rem; color: #475569; }
+  .city-tag   { font-size: 1.1rem; color: #94a3b8; margin-top: 2px; }
+
+  .date-main { font-weight: 600; color: #334155; font-size: 1.25rem; }
+  .date-time { font-size: 1.1rem; color: #94a3b8; margin-top: 2px; }
+
+  /* Status badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .status-badge.complete {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+  .status-badge.pending {
+    background: #fefce8;
+    color: #854d0e;
+    border: 1px solid #fde68a;
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .status-badge.complete .status-dot { background: #16a34a; }
+  .status-badge.pending  .status-dot {
+    background: #f59e0b;
+    animation: pulse-amber 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse-amber {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+
+  /* Delivery track */
+  .delivery-track { display: flex; align-items: center; gap: 3px; }
+  .track-step {
+    height: 4px; border-radius: 2px;
+    background: #e2e8f0; flex: 1;
+  }
+  .track-step.done   { background: #1e8a57; }
+  .track-step.active {
+    background: linear-gradient(90deg, #1e8a57, #f1c40f);
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+  @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.6} }
+  .track-label { font-size: 1.05rem; color: #94a3b8; margin-top: 4px; }
+
+  /* ── Expanded product rows ── */
+  .order-expand-row { display: none; }
+  .order-expand-row.open { display: table-row; }
+
+  .expand-inner {
+    background: #f8fff9;
+    border-bottom: 2px solid #bbf7d0;
+    padding: 0;
+  }
+
+  .expand-panel {
+    padding: 16px 20px 20px 60px;
+  }
+
+  .expand-panel-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e8a57;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+
+  .product-line {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px dashed #dcfce7;
+  }
+  .product-line:last-child { border-bottom: none; }
+
+  .product-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+    background: #f1f5f9;
+    flex-shrink: 0;
+  }
+
+  .product-thumb-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: #dcfce7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+  }
+
+  .product-info { flex: 1; }
+  .product-title { font-size: 1.3rem; font-weight: 600; color: #0f172a; }
+  .product-farmer { font-size: 1.1rem; color: #94a3b8; margin-top: 2px; }
+
+  .product-qty {
+    font-size: 1.2rem;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+
+  .product-subtotal {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #0f172a;
+    min-width: 100px;
+    text-align: right;
+  }
+
+  .expand-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #bbf7d0;
+  }
+
+  .expand-shipping {
+    font-size: 1.2rem;
+    color: #64748b;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .expand-shipping span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .expand-total {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e8a57;
+  }
+
+  /* Empty state */
+  .dash-empty { padding: 60px 20px; text-align: center; }
+  .dash-empty-icon { font-size: 3.5rem; margin-bottom: 14px; opacity: 0.4; }
+  .dash-empty h3 { font-size: 1.6rem; color: #94a3b8; font-weight: 600; margin-bottom: 6px; }
+  .dash-empty p { font-size: 1.3rem; color: #cbd5e1; }
+
+  /* ── Responsive ── */
+  @media (max-width: 1100px) { .dash-stats { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 768px) {
+    .dash-stats { grid-template-columns: repeat(2, 1fr); }
+    .dash-table th:nth-child(5),
+    .dash-table td:nth-child(5),
+    .dash-table th:nth-child(8),
+    .dash-table td:nth-child(8) { display: none; }
+    .expand-panel { padding-left: 20px; }
+  }
+  @media (max-width: 540px) {
+    .dash-stats { grid-template-columns: 1fr 1fr; }
+    .stat-value { font-size: 1.8rem; }
+  }
+</style>
+
+<div class="dash-root">
+  <div class="dash-inner">
+
+    <!-- Header -->
+    <div class="dash-topbar">
+      <div class="dash-title-block">
+        <h1>Orders Command Centre</h1>
+        <p>SokoDirect · Live marketplace order flow</p>
+      </div>
+      <div class="dash-topbar-right">
+        <a href="?{% if status_filter != 'all' %}status={{ status_filter }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}export=csv"
+           class="btn-export-csv">
+          ⬇ Export CSV
+        </a>
+        <div class="last-refresh">
+          Refreshed <span>{% now "d M Y · H:i" %}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="dash-stats">
+      <div class="stat-card green">
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value">{{ total_orders }}</div>
+        <div class="stat-sub">All time</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value">{{ pending_count }}</div>
+        <div class="stat-sub">Awaiting payment</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value">{{ complete_count }}</div>
+        <div class="stat-sub">Paid & confirmed</div>
+      </div>
+      <div class="stat-card purple">
+
+        <div class="stat-label">Revenue</div>
+        <div class="stat-value kes">KES {{ total_revenue|floatformat:0 }}</div>
+        <div class="stat-sub">From completed orders</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="dash-toolbar">
+      <div class="filter-pill-group">
+        <a href="?status=all{% if search_query %}&search={{ search_query }}{% endif %}"
+           class="filter-pill {% if status_filter == 'all' %}active{% endif %}">
+          All ({{ total_orders }})
+        </a>
+        <a href="?status=pending{% if search_query %}&search={{ search_query }}{% endif %}"
+           class="filter-pill {% if status_filter == 'pending' %}active{% endif %}">
+          Pending ({{ pending_count }})
+        </a>
+        <a href="?status=complete{% if search_query %}&search={{ search_query }}{% endif %}"
+           class="filter-pill {% if status_filter == 'complete' %}active{% endif %}">
+          Complete ({{ complete_count }})
+        </a>
+      </div>
+
+      <form method="GET" class="dash-search">
+        <input type="hidden" name="status" value="{{ status_filter }}">
+        <input type="text" name="search" placeholder="Search customer or TXN ID…"
+               value="{{ search_query }}">
+        <button type="submit">⌕</button>
+      </form>
+
+      {% if search_query %}
+      <a href="?status={{ status_filter }}"
+         style="font-size:1.2rem; color:#ef4444; text-decoration:none; font-weight:600;">
+        ✕ Clear
+      </a>
+      {% endif %}
+
+      <span class="dash-result-count">{{ orders|length }} result{{ orders|length|pluralize }}</span>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="dash-table-wrap">
+      {% if orders %}
+      <table class="dash-table">
+        <thead>
+          <tr>
+            <th style="width:32px;"></th>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Amount</th>
+            <th>Delivery Area</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Track</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          {% with shipping=order.shippingaddress_set.first %}
+
+          <!-- Main row — click to expand -->
+          <tr class="order-main-row" onclick="toggleRow({{ order.id }}, this)">
+            <td>
+              <span class="expand-icon">▼</span>
+            </td>
+            <td>
+              <div class="order-id-cell">#{{ order.id }}</div>
+              {% if order.transaction_id %}
+              <div class="txn-snippet">{{ order.transaction_id|slice:":10" }}…</div>
+              {% endif %}
+            </td>
+            <td>
+              <div class="customer-cell">
+                <div class="customer-avatar">
+                  {{ order.customer.first_name|first|default:order.customer.username|first }}
+                </div>
+                <div>
+                  <div class="customer-name">
+                    {{ order.customer.get_full_name|default:order.customer.username }}
+                  </div>
+                  <div class="customer-username">@{{ order.customer.username }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="items-pill">
+               {{ order.get_cart_items }} item{{ order.get_cart_items|pluralize }}
+              </span>
+            </td>
+            <td>
+              <div class="amount-cell">KES {{ order.get_cart_total|floatformat:2 }}</div>
+            </td>
+            <td>
+              {% if shipping %}
+              <div class="county-tag"> {{ shipping.county }}</div>
+              <div class="city-tag">{{ shipping.city }}</div>
+              {% else %}
+              <span style="color:#cbd5e1;">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="date-main">{{ order.date_ordered|date:"d M Y" }}</div>
+              <div class="date-time">{{ order.date_ordered|date:"H:i" }}</div>
+            </td>
+            <td>
+              {% if order.complete %}
+              <span class="status-badge complete">
+                <span class="status-dot"></span>Paid
+              </span>
+              {% else %}
+              <span class="status-badge pending">
+                <span class="status-dot"></span>Pending
+              </span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="delivery-track">
+                {% if order.complete %}
+                  <div class="track-step done"></div>
+                  <div class="track-step done"></div>
+                  <div class="track-step active"></div>
+                  <div class="track-step"></div>
+                {% else %}
+                  <div class="track-step done"></div>
+                  <div class="track-step"></div>
+                  <div class="track-step"></div>
+                  <div class="track-step"></div>
+                {% endif %}
+              </div>
+              <div class="track-label">
+                {% if order.complete %}Confirmed{% else %}Ordered{% endif %}
+              </div>
+            </td>
+          </tr>
+
+          <!-- Expandable product detail row -->
+          <tr class="order-expand-row" id="expand-{{ order.id }}">
+            <td colspan="9" class="expand-inner">
+              <div class="expand-panel">
+                <div class="expand-panel-title"> Products in Order #{{ order.id }}</div>
+
+                {% for item in order.orderitem_set.all %}
+                <div class="product-line">
+                  {% if item.product.imageURL %}
+                  <img src="{{ item.product.imageURL }}" alt="{{ item.product.title }}"
+                       class="product-thumb">
+                  {% else %}
+                  <div class="product-thumb-placeholder">🌿</div>
+                  {% endif %}
+
+                  <div class="product-info">
+                    <div class="product-title">{{ item.product.title }}</div>
+                    <div class="product-farmer">
+                      Farmer: {{ item.product.owner.name|default:item.product.owner.username }}
+                    </div>
+                  </div>
+
+                  <span class="product-qty">× {{ item.quantity }}</span>
+
+                  <div class="product-subtotal">
+                    KES {{ item.get_total|floatformat:2 }}
+                  </div>
+                </div>
+                {% endfor %}
+
+                <div class="expand-footer">
+                  <div class="expand-shipping">
+                    {% if shipping %}
+                    <span> {{ shipping.county }}, {{ shipping.city }}</span>
+                    <span> {{ shipping.address }}</span>
+                    {% if shipping.phone_number %}
+                    <span> {{ shipping.phone_number }}</span>
+                    {% endif %}
+                    {% else %}
+                    <span style="color:#94a3b8;">No shipping address saved</span>
+                    {% endif %}
+                  </div>
+                  <div class="expand-total">
+                    Total: KES {{ order.get_cart_total|floatformat:2 }}
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% else %}
+      <div class="dash-empty">
+        <div class="dash-empty-icon">📋</div>
+        <h3>No orders found</h3>
+        <p>
+          {% if search_query %}
+            No results for "{{ search_query }}" — try a different search.
+          {% else %}
+            No {{ status_filter }} orders yet.
+          {% endif %}
+        </p>
+      </div>
+      {% endif %}
+    </div>
+
+    <div style="margin-top:16px; font-size:1.15rem; color:#94a3b8; text-align:right;">
+      Delivery tracking stages will activate when logistics integration is connected.
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function toggleRow(orderId, rowEl) {
+    var expandRow = document.getElementById('expand-' + orderId);
+    var isOpen = expandRow.classList.contains('open');
+
+    // Close all open rows first
+    document.querySelectorAll('.order-expand-row.open').forEach(function(r) {
+      r.classList.remove('open');
+    });
+    document.querySelectorAll('.order-main-row.expanded').forEach(function(r) {
+      r.classList.remove('expanded');
+    });
+
+    // If this row was closed, open it
+    if (!isOpen) {
+      expandRow.classList.add('open');
+      rowEl.classList.add('expanded');
+    }
+  }
+</script>
+
+{% endblock content %}

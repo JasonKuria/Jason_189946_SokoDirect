@@ -3,7 +3,8 @@ from . import views
 
 urlpatterns = [
     path('cart/', views.cart_view, name="cart"),
-    path('checkout/', views.checkout_view, name="checkout"),
+    #path('checkout/', views.checkout_view, name="checkout"),
+    path('checkout/', views.checkout, name="checkout"),
 
     # NEW ASYNC TRANSACTION PATHWAY ENDPOINT
     path('update_item/', views.update_item_view, name="update_item"),
