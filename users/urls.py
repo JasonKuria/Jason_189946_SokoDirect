@@ -13,6 +13,8 @@ urlpatterns = [
     path('logout/', views.logoutUser, name='logout'),
     path('register/', views.registerUser, name='register'), # <--- Added sign-up route
 
+    path('verify/<str:token>/', views.verifyEmail, name='verify-email'),
+
     # Secure Account Space Tracking Paths
     path('account/', views.userAccount, name='account'), # <--- New User Account Route
     path('edit-account/', views.editAccount, name='edit-account'), # <--- Profile Form Path
@@ -21,7 +23,7 @@ urlpatterns = [
     path('create-speciality/', views.createSpeciality, name='create-speciality'),
     path('update-speciality/<str:pk>/', views.updateSpeciality, name='update-speciality'),
     path('delete-speciality/<str:pk>/', views.deleteSpeciality, name='delete-speciality'),
-
+   
     # Messages
     path('inbox/', views.inbox, name='inbox'),
     path('message/<str:pk>', views.viewMessage, name='message'),  

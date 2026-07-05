@@ -1,0 +1,35 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  /* This creates a centered, full-height container that pushes the footer down */
+  .isolated-auth-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10rem !important;
+    padding-bottom: 8rem !important;
+    min-height: calc(100vh - 120px); 
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  .card {
+    max-width: 500px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    background: white;
+  }
+</style>
+
+<div class="isolated-auth-wrapper">
+    <div class="card">
+        <h3>Check your email!</h3>
+        <p>We've sent a verification link to your email address. Please click it to activate your account and continue to your profile.</p>
+    </div>
+</div>
+
+{% endblock content %}
