@@ -1,0 +1,24 @@
+{% extends 'main.html' %}
+{% block content %}
+<style>
+.success-wrap{max-width:540px;margin:6rem auto;padding:0 1.5rem;text-align:center}
+.success-icon{font-size:5rem;margin-bottom:1.5rem}
+.success-title{font-size:2.4rem;font-weight:800;color:#0e6e36;margin-bottom:.6rem}
+.success-sub{font-size:1.4rem;color:#555;line-height:1.6;margin-bottom:2rem}
+.success-receipt{background:#f0faf4;border:1.5px solid #a8d5b5;border-radius:.5rem;padding:1.2rem 1.5rem;font-size:1.35rem;color:#1a1a1a;margin-bottom:2rem}
+.success-btn{display:inline-block;background:#1c5235;color:#fff;padding:1rem 2.5rem;border-radius:.5rem;font-size:1.4rem;font-weight:700;text-decoration:none;transition:background .2s}
+.success-btn:hover{background:#0e3d26}
+</style>
+
+<div class="success-wrap">
+  <h2 class="success-title">Payment Successful!</h2>
+  <p class="success-sub">
+    Your SokoDirect order has been confirmed.<br>
+    The farmer will be notified and your produce is on its way.
+  </p>
+  <div class="success-receipt">
+    M-Pesa Receipt: <strong>{{ payment.mpesa_receipt }}</strong>
+  </div>
+  <a href="{% url 'products' %}" class="success-btn">Continue Shopping</a>
+</div>
+{% endblock content %}

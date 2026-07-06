@@ -13,6 +13,10 @@ class Profile(models.Model):
         on_delete=models.CASCADE,
         null=True, blank=True
     )
+    is_email_verified = models.BooleanField(default=False)
+    is_farmer_verified = models.BooleanField(default=False)
+    email_verification_token = models.CharField(max_length=100, null=True, blank=True)
+
 
     # Basic info — replicated from User for easy access
     name = models.CharField(max_length=200, null=True, blank=True)

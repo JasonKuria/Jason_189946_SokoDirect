@@ -1,0 +1,410 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'styles/cart.css' %}" />
+
+<style>
+  /* Base structural container with top spacing to clear the fixed navigation header */
+  .SokoDirect-cart-wrapper-main {
+    padding-top: 0.5rem !important; /* Uniform height match to clear the navigation bar */
+    background-color: #f7f9fa;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 4rem;
+  }
+
+  .SokoDirect-cart-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  /* Left Main Side: Cart list card */
+  .SokoDirect-cart-main {
+    flex: 1;
+  }
+
+  .SokoDirect-paper-card {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .cart-header-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 12px;
+  }
+
+  /* Cart Item Rows matching Good.PNG exactly */
+  .SokoDirect-cart-item {
+    display: flex;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid #f1f5f9;
+    align-items: center;
+  }
+
+  .SokoDirect-cart-item:last-of-type {
+    border-bottom: none;
+  }
+
+  .item-img-box {
+    width: 90px;
+    height: 90px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    flex-shrink: 0;
+  }
+
+  .item-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Flex content wrapper to separate titles/buttons from right price tags */
+  .item-details-box {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .item-info-col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .item-title-text {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .item-farmer-tag {
+    font-size: 1.2rem;
+    color: #94a3b8;
+    margin: 0;
+  }
+
+  /* Remove Item Label Button */
+  .btn-SokoDirect-delete {
+    background: none;
+    border: none;
+    color: #1e8a57;
+    font-weight: 600;
+    font-size: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 10px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .btn-SokoDirect-delete:hover {
+    color: #15613c;
+  }
+
+  /* Center Controls Block for Quantity */
+  .item-controls-col {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+    margin-right: 24px;
+  }
+
+  .SokoDirect-quantity-control {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .btn-qty-step {
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .btn-qty-step:hover {
+    background: #e2e8f0;
+  }
+
+  .qty-display-value {
+    width: 40px;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  /* Right Pricing Alignments */
+  .item-price-tag {
+    text-align: right;
+    min-width: 110px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .item-total-price {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .item-unit-price {
+    font-size: 1.15rem;
+    color: #94a3b8;
+  }
+
+  /* Right Sidebar Summary Section */
+  .SokoDirect-cart-sidebar {
+    width: 360px;
+    position: sticky;
+    top: 12rem;
+    flex-shrink: 0;
+  }
+
+  .summary-title {
+    font-size: 1.25rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.5rem;
+    color: #475569;
+    margin-bottom: 12px;
+  }
+
+  .total-row {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 14px;
+    margin-top: 14px;
+    margin-bottom: 20px;
+  }
+
+  .total-price-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .btn-SokoDirect-checkout {
+    display: block;
+    width: 100%;
+    background: #000000 !important;
+    color: #ffffff !important;
+    text-align: center;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+
+  .btn-SokoDirect-checkout:hover {
+    background: #1e293b !important;
+  }
+
+  .link-continue-shopping {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 1.35rem;
+    color: #1e8a57;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .link-continue-shopping:hover {
+    text-decoration: underline;
+  }
+
+  @media screen and (max-width: 950px) {
+    .SokoDirect-cart-container {
+      flex-direction: column;
+    }
+    .SokoDirect-cart-sidebar {
+      width: 100%;
+      position: static;
+    }
+    .SokoDirect-cart-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .item-details-box {
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .item-controls-col {
+      margin-left: 0;
+      width: 100%;
+      justify-content: space-between;
+    }
+    .item-price-tag {
+      text-align: left;
+    }
+  }
+</style>
+
+<div class="SokoDirect-cart-wrapper-main">
+  <main class="SokoDirect-cart-container">
+
+    <!-- Left Column: Product Row Elements List -->
+    <div class="SokoDirect-cart-main">
+      <div class="SokoDirect-paper-card">
+        <h2 class="cart-header-title">Cart ({{ order.get_cart_items|floatformat:"0" }})</h2>
+
+        {% for item in items %}
+        <div class="SokoDirect-cart-item">
+          <!-- Thumbnail Render Frame -->
+          <div class="item-img-box">
+            {% if item.product.imageURL %}
+              <img src="{{ item.product.imageURL }}" alt="{{ item.product.title }} preview" />
+            {% else %}
+              <img src="{% static 'images/placeholder.png' %}" alt="Placeholder produce frame">
+            {% endif %}
+          </div>
+
+          <!-- Description, Quantity Counter, Price Information Row -->
+          <div class="item-details-box">
+            <div class="item-info-col">
+              <h3 class="item-title-text">{{ item.product.title }}</h3>
+              <p class="item-farmer-tag">Farmer: <strong>{{ item.product.owner.username }}</strong></p>
+              
+              <!-- Clean Green Trash Action Label -->
+              <button 
+                data-product="{{ item.product.id }}" 
+                data-action="delete_item" 
+                class="btn-SokoDirect-delete update-cart"
+              >
+                🗑 Remove
+              </button>
+            </div>
+
+            <!-- Incremental Buttons Control Unit -->
+            <div class="item-controls-col">
+              <div class="SokoDirect-quantity-control">
+                <button 
+                  data-product="{{ item.product.id }}" 
+                  data-action="remove" 
+                  class="btn-qty-step update-cart"
+                >
+                  −
+                </button>
+                
+                <span id="quantity-{{ item.product.id }}" class="qty-display-value">{{ item.quantity|floatformat:"0" }}</span>
+                
+                <button 
+                  data-product="{{ item.product.id }}" 
+                  data-action="add" 
+                  class="btn-qty-step update-cart"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <!-- Subtotal Unit Pricing Column -->
+            <div class="item-price-tag">
+              <span class="item-total-price">KES {{ item.get_total|floatformat:2 }}</span>
+              <span class="item-unit-price">KES {{ item.product.price|floatformat:2 }} x {{ item.quantity|floatformat:"0" }}</span>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div style="padding: 40px 20px; text-align: center;">
+          <div style="font-size: 4rem; margin-bottom: 10px;"></div>
+          <h3 style="color: #282828; margin-bottom: 8px; font-weight: 500;">Your cart is empty!</h3>
+          <p style="color: #75757a; font-size: 1.3rem; margin-bottom: 20px;">Browse our marketplace to discover and source fresh premium agricultural produce directly from verified local farmers.</p>
+          <a href="{% url 'products' %}" class="btn-SokoDirect-checkout" style="display: inline-block; width: auto; padding: 12px 30px;">Start Shopping</a>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if items %}
+        <a href="{% url 'products' %}" class="link-continue-shopping">
+          &larr; Continue Shopping Produce
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Right Sidebar Column: Order Calculation Card Summary -->
+    {% if items %}
+    <div class="SokoDirect-cart-sidebar">
+      <div class="SokoDirect-paper-card">
+        <h3 class="summary-title">Cart Summary</h3>
+        
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span style="font-weight: 600; color: #1e293b;">KES {{ order.get_cart_total|floatformat:2 }}</span>
+        </div>
+        
+        <div class="summary-row" style="font-size: 1.3rem; color: #94a3b8;">
+          <span>Delivery fees</span>
+          <span style="font-style: italic;">Calculated at checkout step</span>
+        </div>
+
+        <div class="summary-row total-row">
+          <span style="font-weight: 600; color: #1e293b;">Total Amount</span>
+          <span class="total-price-text">KES {{ order.get_cart_total|floatformat:2 }}</span>
+        </div>
+
+        <a href="{% url 'checkout' %}" class="btn-SokoDirect-checkout">
+          Proceed to Checkout (KES {{ order.get_cart_total|floatformat:2 }})
+        </a>
+      </div>
+      
+      <div class="SokoDirect-paper-card" style="text-align: left; margin-top: 12px; padding: 16px; background-color: #e8f8f0; border: 1px solid #c2ebd0; border-radius: 8px;">
+        <p style="font-size: 1.15rem; color: #1e5829; line-height: 1.5; margin: 0;">
+          Direct farmer sourcing guarantees peak product freshness and optimized bulk distribution margins.
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+  </main>
+</div>
+
+{% endblock content %}

@@ -32,6 +32,27 @@
     display: flex;
     justify-content: center;
   }
+
+  .form__field {
+        position: relative;
+    }
+
+  #togglePassword {
+      position: absolute;
+      right: 10px;
+      top: 35px; /* Adjust this so it aligns with your input height */
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: #333;
+  }  
+
+  /* Add this to your <style> block */
+  .form__field label.required::after {
+      content: " *";
+      color: red;
+  }
+
 </style>
 
 <div class="isolated-auth-wrapper">
@@ -54,14 +75,27 @@
                     {% csrf_token %}
 
           {% for field in form %}
-            <div class="form__field">
-                <label for="formInput#text">{{field.label}}: </label>
+
+            <div class="form__field" style="position: relative;">
+
+                <label for="{{ field.id_for_label }}" class="{% if field.field.required %}required{% endif %}">
+                  {{field.label}}: 
+                </label>
                 {{field}}
+
+                {% if field.name == 'password1' or field.name == 'password2' %}
+                    <button type="button" class="toggle-password" data-target="{{ field.id_for_label }}" 
+                            style="position: absolute; right: 10px; top: 35px; cursor: pointer; border: none; background: none;">
+                        Show
+                    </button>
+                {% endif %}
 
                 {% for error in field.errors %}
                   <p style="color: red;">{{error}}</p>
                 {% endfor %}
-            </div>          
+
+            </div>  
+
           {% endfor %}
 
           <div class="auth__actions">
@@ -94,13 +128,13 @@
                         {% csrf_token %}
 
                         <div class="form__field">
-                            <label for="formInput#text">Username: </label>
+                            <label for="formInput#email">Email: </label>
                             <input
                             class="input input--text"
-                            id="formInput#text"
-                            type="text"
-                            name="username"
-                            placeholder="Enter your username..."
+                            id="formInput#email"
+                            type="email"
+                            name="email"
+                            placeholder="Enter your email..."
                             />
                         </div>
 
@@ -108,11 +142,15 @@
                             <label for="formInput#password">Password: </label>
                             <input
                             class="input input--password"
-                            id="formInput#passowrd"
+                            id="formInput#password"
                             type="password"
                             name="password"
                             placeholder="••••••••"
                             />
+                            <button type="button" class="toggle-password" data-target="formInput#password" 
+                                    style="position: absolute; right: 10px; top: 35px; cursor: pointer; border: none; background: none;">
+                                Show
+                            </button>                           
                         </div>
                         <div class="auth__actions">
                             <input class="btn btn--sub btn--lg" type="submit" value="Log In" />
@@ -129,6 +167,24 @@
 
 {% endif %}
 
-</div> {% endblock content %}
+</div> 
 
 
+<script>
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const passwordInput = document.getElementById(targetId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                this.textContent = 'Show';
+            }
+        });
+    });
+</script>
+
+{% endblock content %}

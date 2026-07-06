@@ -11,9 +11,15 @@ from .forms import CustomUserCreationForm, ProfileForm, SpecialityForm, MessageF
 from .utils import searchProfiles, paginateProfiles
 
 import json
-#from orders.utils import cartData # 1. Import cartData to read the cookie contents
-#from orders.models import Order, OrderItem
+from orders.utils import cartData # 1. Import cartData to read the cookie contents
+from orders.models import Order, OrderItem
 from products.models import Product
+
+import uuid
+from django.core.mail import send_mail
+from django.conf import settings
+
+from django.utils.html import strip_tags
 
 def loginUser(request):
     page = 'login' 
@@ -22,23 +28,28 @@ def loginUser(request):
         return redirect('products') 
 
     # Fetch guest cookie data for the navbar display badge
-    #data = cartData(request)
-    #cart_items_count = data['cartItems']
+    data = cartData(request)
+    cart_items_count = data['cartItems']
 
     if request.method == 'POST':
-        username_input = request.POST.get('username').strip().lower()
-        password_input = request.POST.get('password')
+        #username_input = request.POST.get('username').strip().lower()
+        email_input = request.POST.get('email').strip().lower()
+        password_input = request.POST.get('password')     
         
         try:
-            user_exists = User.objects.get(username=username_input)
+            #user_exists = User.objects.get(username=username_input)
+            user_obj = User.objects.get(email=email_input)
+            username_input = user_obj.username # Get the actual username            
         except User.DoesNotExist:
-            messages.error(request, "Account username does not exist.")
-            #context = {'page': page, 'cartItems': cart_items_count}
-            context = {'page': page,}            
+            #messages.error(request, "Account username does not exist.")
+            messages.error(request, "No account found with this email.")
+            context = {'page': page, 'cartItems': cart_items_count}
             return render(request, 'users/login_register.html', context)
 
+        #user = authenticate(request, username=username_input, password=password_input)
+        # Authenticate using the retrieved username
         user = authenticate(request, username=username_input, password=password_input)
-        
+
         if user is not None:
             try:
                 cart = json.loads(request.COOKIES.get('cart', '{}'))
@@ -54,23 +65,23 @@ def loginUser(request):
             # Migrate items over to database models cleanly
             if cart:
                 # --- FIXED: Changed user=user to customer=user to match your model layout ---
-                #order, created = Order.objects.get_or_create(customer=user, complete=False)
+                order, created = Order.objects.get_or_create(customer=user, complete=False)
                 
                 for product_id, item_data in cart.items():
                     try:
                         product = Product.objects.get(id=product_id)
                         quantity = int(item_data.get('quantity', 0))
                         
-                        #order_item, item_created = OrderItem.objects.get_or_create(
-                        #    order=order, 
-                        #    product=product,
-                        #    defaults={'quantity': quantity}
-                        #)
+                        order_item, item_created = OrderItem.objects.get_or_create(
+                            order=order, 
+                            product=product,
+                            defaults={'quantity': quantity}
+                        )
                         
-                        #if not item_created:
-                        #    order_item.quantity += quantity
+                        if not item_created:
+                            order_item.quantity += quantity
                             
-                        #order_item.save()
+                        order_item.save()
                     except (Product.DoesNotExist, ValueError):
                         continue
 
@@ -89,9 +100,10 @@ def loginUser(request):
 
     context = {
         'page': page, 
-        #'cartItems': cart_items_count 
+        'cartItems': cart_items_count 
     }
     return render(request, 'users/login_register.html', context)
+
 
 def logoutUser(request):
     logout(request) 
@@ -112,8 +124,67 @@ def registerUser(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
+            user.is_active = False # Deactivate user until email is verified
             user.username = user.username.lower()
             user.save() 
+
+            # Store the token in the profile
+            profile = user.profile
+            profile.email_verification_token = str(uuid.uuid4())
+            profile.save()
+
+            # Send verification email
+            # ===============================================================
+            # ================================================================
+            verify_url = f"http://{request.get_host()}/users/verify/{profile.email_verification_token}/"
+            subject = '[SokoDirect] Click this link to confirm your email address'
+
+            #Define the HTML message
+            html_message = f"""
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                <h2 style="color: #2c3e50;">Welcome to SokoDirect!</h2>
+                <p>Confirm your email address by clicking on this link:</p>
+                    
+                <div style="background-color: #f4f4f4; padding: 15px; border-radius: 5px; text-align: center;">
+                    <p style="margin: 0;"><strong>{verify_url}</strong></p>
+                </div>
+
+                <p>If you didn't create a SokoDirect MarketPlace account, you can ignore this email.</p>
+                    
+                <br>
+                <p>Best regards,<br>
+                <strong>The SokoDirect Team</strong></p>
+                <hr style="border: 0; border-top: 1px solid #eee;">
+                <p style="font-size: 0.8em; color: #888;">Powered by SokoDirect MarketPlace</p>
+            </div>
+            """  
+
+            # Plain text fallback (essential for email clients that don't render HTML)
+            plain_message = strip_tags(html_message) 
+
+            # Send the mail
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[profile.email],
+                html_message=html_message,
+                fail_silently=False,
+            )             
+
+
+            # X# verify_url = f"http://{request.get_host()}/users/verify/{profile.email_verification_token}/"
+            # X# send_mail(
+            # X#     'Verify your SokoDirect Account',
+            # X#     f'Click this link to verify your account: {verify_url}',
+            # X#     settings.EMAIL_HOST_USER,
+            # X#     [user.email],
+            # X# )       
+            # ===============================================================
+            # ================================================================
+
+            # Redirect to the "Check your email" page
+            return render(request, 'users/verify_email_sent.html')
             
             messages.success(request, "Your SokoDirect farmer account was created successfully!")
             login(request, user)
@@ -123,6 +194,72 @@ def registerUser(request):
             
     context = {'page': page, 'form': form}
     return render(request, 'users/login_register.html', context)
+
+# Create the Verification View
+# This is the simple logic that flips the switch once they click the link in their email.
+def verifyEmail(request, token):
+    profile = Profile.objects.filter(email_verification_token=token).first()
+    if profile:
+        profile.user.is_active = True
+        profile.user.save()
+        profile.email_verification_token = None
+        profile.save()
+        
+        #messages.success(request, "Account verified! Please log in.")
+        messages.success(request, "Account verified! Please Update your profile.")        
+        
+        # ------------------SEND WELCOME EMAIL--------------------------------
+        # ---------------AFTER EMAIL VERIFICATION-----------------------------
+        subject = '[Welcome] to SokoDirect MarketPlace'
+
+        #Define the HTML message
+        html_message = f"""
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #2c3e50;">Welcome to SokoDirect!</h2>
+            <p>Hi <strong>{profile.name}</strong>,</p>
+            <p>We're thrilled to have you as part of our community. Your account has been successfully created and you're all set to start using SokoDirect MarketPlace.</p>
+                
+            <div style="background-color: #f4f4f4; padding: 15px; border-radius: 5px; text-align: center;">
+                <p style="margin: 0;"><strong>Your Login Email:</strong></p>
+                <p style="font-size: 1.2em; color: #27ae60; margin: 5px 0;">{profile.email}</p>
+            </div>
+
+            <p>If you didn't create this account, please contact our support team immediately.</p>
+                
+            <br>
+            <p>Best regards,<br>
+            <strong>The SokoDirect Team</strong></p>
+            <hr style="border: 0; border-top: 1px solid #eee;">
+            <p style="font-size: 0.8em; color: #888;">Powered by SokoDirect MarketPlace</p>
+        </div>
+        """     
+        # Plain text fallback (essential for email clients that don't render HTML)
+        plain_message = strip_tags(html_message)           
+
+        # Send the mail
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[profile.email],
+            html_message=html_message,
+            fail_silently=False,
+        )   
+        # --------------------------------------------------------------------
+        # --------------------------------------------------------------------        
+
+
+        #Redirect to login page!
+        return redirect('login')
+
+        #Redirect to User Profile Page   
+        #login(request, profile.user)
+        #return redirect('edit-account') 
+    else:
+        messages.error(request, "Invalid or expired link.")
+        return redirect('register')
+    
+
 
 def profiles(request):
     profiles, search_query = searchProfiles(request) 
@@ -264,6 +401,7 @@ def createMessage(request, pk):
 
     context = {'recipient': recipient, 'form': form}
     return render(request, 'users/message_form.html', context)
+
 
 
 def userManagementDashboard(request):
