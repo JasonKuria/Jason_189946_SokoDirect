@@ -9,5 +9,6 @@ urlpatterns = [
     path('payment/callback/',            views.mpesa_callback,       name='mpesa-callback'),
     path('order/success/',               views.order_success,        name='order-success'),
     
+    path('payment/reports/',             views.payment_report,       name='payment-reports'),
 
 ]

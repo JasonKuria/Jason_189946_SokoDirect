@@ -28,3 +28,13 @@ Thumbs.db
 
 # Python cache
 .pytest_cache/
+
+#json files
+datadump_utf8.json
+datadump.json
+ 
+#db.sqlite3 backup
+db.sqlite3.backup
+
+#conversion file
+fix_encoding.py

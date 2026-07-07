@@ -16,9 +16,35 @@
     Your SokoDirect order has been confirmed.<br>
     The farmer will be notified and your produce is on its way.
   </p>
+
   <div class="success-receipt">
     M-Pesa Receipt: <strong>{{ payment.mpesa_receipt }}</strong>
   </div>
+
+  <div class="receipt-box">
+      <p>
+          <strong>Receipt:</strong>
+          {{ payment.mpesa_receipt }}
+      </p>
+      <p>
+          <strong>Amount:</strong>
+          KES {{ payment.amount }}
+      </p>
+      <p>
+          <strong>Phone:</strong>
+          {{ payment.phone_number }}
+      </p>
+      <p>
+          <strong>Order:</strong>
+          #{{ payment.order.id }}
+      </p>
+      <p>
+        <strong>Date:</strong>
+        {{ payment.paid_at|date:"d M Y, H:i" }}
+      </p>      
+  </div>
+
   <a href="{% url 'products' %}" class="success-btn">Continue Shopping</a>
 </div>
+
 {% endblock content %}

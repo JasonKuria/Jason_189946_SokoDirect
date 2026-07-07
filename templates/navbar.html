@@ -137,21 +137,30 @@
         <a href="{% url 'create-product' %}" class="btn-post-ad-global" style="padding: 4px 8px; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; text-decoration: none; color: #f1c40f !important;">
           Post an Item / Produce AD
         </a>
-        |
-        <a href="{% url 'userdashboard' %}" class="btn-post-ad-global" style="padding: 4px 8px; font-size: 1.1rem; font-weight: 700; 
-                                                                              text-transform: uppercase; text-decoration: none; 
-                                                                              color: #f1c40f !important;">
-          Farmers/Buyers Dashboard
-        </a>
-        
-        
 
-        | 
-        <a href="{% url 'orders_dashboard' %}" class="btn-post-ad-global"
-            style="padding:4px 8px; font-size:1.1rem; font-weight:700;
-                    text-transform:uppercase; text-decoration:none; color:#f1c40f !important;">
-            All Orders
-        </a>    
+        
+        
+        {% if request.user.is_staff %}
+          |
+          <a href="{% url 'userdashboard' %}" class="btn-post-ad-global" style="padding: 4px 8px; font-size: 1.1rem; font-weight: 700; 
+                                                                                text-transform: uppercase; text-decoration: none; 
+                                                                                color: #f1c40f !important;">
+            Farmers/Buyers Dashboard
+          </a>
+          |
+          <a href="{% url 'orders_dashboard' %}" class="btn-post-ad-global"
+              style="padding:4px 8px; font-size:1.1rem; font-weight:700;
+                      text-transform:uppercase; text-decoration:none; color:#f1c40f !important;">
+              All Orders
+          </a>   
+          |
+          <a href="{% url 'payment-reports' %}" class="btn-post-ad-global"
+              style="padding:4px 8px; font-size:1.1rem; font-weight:700;
+                      text-transform:uppercase; text-decoration:none; color:#f1c40f !important;">
+              Payment Reports
+          </a>  
+        {% endif %}     
+
       {% endif %}  
         | 
       <a href="{% url 'contact' %}" class="btn-post-ad-global"

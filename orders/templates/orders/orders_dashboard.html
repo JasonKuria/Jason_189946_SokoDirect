@@ -398,7 +398,7 @@
   }
 
   .expand-panel {
-    padding: 16px 20px 20px 60px;
+    padding: 0px 60px 0px 60px;
   }
 
   .expand-panel-title {
@@ -466,8 +466,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 14px;
-    padding-top: 12px;
+    margin-top: 1px; 
+    padding-top: 1px;
     border-top: 1px solid #bbf7d0;
   }
 
@@ -475,14 +475,14 @@
     font-size: 1.2rem;
     color: #64748b;
     display: flex;
-    gap: 16px;
+    gap: 1px;
     flex-wrap: wrap;
   }
 
   .expand-shipping span {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 1px;
   }
 
   .expand-total {
@@ -624,19 +624,32 @@
               <div class="txn-snippet">{{ order.transaction_id|slice:":10" }}…</div>
               {% endif %}
             </td>
+
             <td>
               <div class="customer-cell">
-                <div class="customer-avatar">
-                  {{ order.customer.first_name|first|default:order.customer.username|first }}
-                </div>
-                <div>
-                  <div class="customer-name">
-                    {{ order.customer.get_full_name|default:order.customer.username }}
+                {% if order.customer %}
+                  <div class="customer-avatar">
+                    {{ order.customer.first_name|first|default:order.customer.username|first }}
                   </div>
-                  <div class="customer-username">@{{ order.customer.username }}</div>
-                </div>
+                  <div>
+                    <div class="customer-name">
+                      {{ order.customer.get_full_name|default:order.customer.username }}
+                    </div>
+                    <div class="customer-username">@{{ order.customer.username }}</div>
+                  </div>
+                {% else %}
+                  <div class="customer-avatar">G</div>
+                  <div>
+                    <div class="customer-name">Guest</div>
+                    <div class="customer-username">—</div>
+                  </div>
+                {% endif %}
               </div>
             </td>
+            
+
+
+
             <td>
               <span class="items-pill">
                {{ order.get_cart_items }} item{{ order.get_cart_items|pluralize }}
@@ -730,9 +743,14 @@
                     <span style="color:#94a3b8;">No shipping address saved</span>
                     {% endif %}
                   </div>
+
                   <div class="expand-total">
                     Total: KES {{ order.get_cart_total|floatformat:2 }}
+                    <p class="product-farmer" style="color: #1e8a57;">
+                      <strong class="product-farmer" style="color: #1e8a57;">Mpesa Receipt:</strong> {{ order.mpesa_receipt }}
+                    </p>
                   </div>
+
                 </div>
               </div>
             </td>

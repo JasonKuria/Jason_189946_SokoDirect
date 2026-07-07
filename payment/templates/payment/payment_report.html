@@ -1,0 +1,497 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<style>
+/* ══════════════════════════════════════════
+   SokoDirect — Payment Reports Dashboard
+══════════════════════════════════════════ */
+:root {
+  --green:  #1C5235;
+  --green2: #27AE60;
+  --yellow: #F5C518;
+  --red:    #C0392B;
+  --blue:   #1E3A8A;
+  --purple: #6B21A8;
+  --gray:   #64748B;
+  --light:  #F0F4F0;
+  --white:  #FFFFFF;
+}
+
+.rpt-wrap { background: #F0F4F0; min-height: 100vh; padding-bottom: 4rem; }
+
+/* ── Header ── */
+.rpt-header {
+  background: linear-gradient(135deg, #0e2e1a 0%, #1C5235 65%, #0e2e6a 100%);
+  padding: 2.4rem 2rem 2rem;
+}
+.rpt-header__inner { max-width: 1340px; margin: 0 auto; }
+.rpt-header__top {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 1rem; margin-bottom: 1.8rem;
+}
+.rpt-header__title { color: #fff; font-size: 2.6rem; font-weight: 800; margin: 0; }
+.rpt-header__sub { color: rgba(255,255,255,0.6); font-size: 1.25rem; margin: .2rem 0 0; }
+.rpt-header__badge {
+  background: rgba(245,197,24,0.15); border: 1px solid rgba(245,197,24,0.4);
+  color: #F5C518; font-size: 1.1rem; font-weight: 600;
+  padding: .4rem 1rem; border-radius: 2rem;
+}
+.rpt-actions { display: flex; gap: .8rem; flex-wrap: wrap; }
+.rpt-btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .7rem 1.4rem; border-radius: .5rem; font-size: 1.25rem;
+  font-weight: 600; cursor: pointer; text-decoration: none; border: none;
+  transition: all .18s;
+}
+.rpt-btn-primary { background: var(--yellow); color: #1a1a1a; }
+.rpt-btn-primary:hover { background: #e5b010; }
+.rpt-btn-outline { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+.rpt-btn-outline:hover { background: rgba(255,255,255,0.2); }
+
+/* ── Stat Cards ── */
+.rpt-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1rem; max-width: 1340px; margin: 0 auto; padding: 2rem 2rem 0;
+}
+@media (max-width: 900px) { .rpt-stats { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 500px) { .rpt-stats { grid-template-columns: 1fr; } }
+
+.stat-card {
+  background: #fff; border-radius: .8rem; padding: 1.4rem 1.6rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  border-top: 4px solid var(--accent-color);
+  position: relative; overflow: hidden;
+}
+.stat-card::after {
+  content: attr(data-icon);
+  position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+  font-size: 3.5rem; opacity: .07;
+}
+.stat-card__label { font-size: 1.1rem; color: var(--gray); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; margin-bottom: .4rem; }
+.stat-card__value { font-size: 2.8rem; font-weight: 800; color: #1a1a1a; line-height: 1.1; margin-bottom: .3rem; }
+.stat-card__sub { font-size: 1.1rem; color: var(--gray); }
+.stat-card__trend { font-size: 1.1rem; font-weight: 600; margin-top: .4rem; }
+.trend-up   { color: var(--green2); }
+.trend-down { color: var(--red); }
+
+/* ── Main Grid ── */
+.rpt-grid {
+  max-width: 1340px; margin: 2rem auto 0; padding: 0 2rem;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem;
+}
+@media (max-width: 800px) { .rpt-grid { grid-template-columns: 1fr; } }
+
+.rpt-panel {
+  background: #fff; border-radius: .9rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden;
+}
+.rpt-panel--full { grid-column: 1 / -1; }
+.rpt-panel__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 1.4rem; border-bottom: 1px solid #e8ede8;
+}
+.rpt-panel__title { font-size: 1.5rem; font-weight: 700; color: #1a1a1a; }
+.rpt-panel__sub   { font-size: 1.1rem; color: var(--gray); margin-top: .2rem; }
+.rpt-panel__body  { padding: 1.2rem 1.4rem; }
+
+/* ── Bar Chart ── */
+.bar-chart { display: flex; flex-direction: column; gap: .7rem; }
+.bar-row { display: flex; align-items: center; gap: .8rem; }
+.bar-row__label { width: 80px; font-size: 1.1rem; color: var(--gray); flex-shrink: 0; text-align: right; }
+.bar-row__track { flex: 1; background: #f0f4f0; border-radius: 2rem; height: 22px; overflow: hidden; }
+.bar-row__fill { height: 100%; border-radius: 2rem; display: flex; align-items: center; padding-left: .6rem; }
+.bar-row__fill span { font-size: 1.05rem; font-weight: 600; color: #fff; white-space: nowrap; }
+.bar-row__value { width: 80px; font-size: 1.1rem; font-weight: 600; color: #1a1a1a; }
+
+/* ── Donut Chart (CSS) ── */
+.donut-wrap { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+.donut {
+  width: 130px; height: 130px; border-radius: 50%; flex-shrink: 0;
+  background: conic-gradient(
+    #27AE60 0% var(--success-pct),
+    #F5C518 var(--success-pct) var(--pending-pct),
+    #C0392B var(--pending-pct) 100%
+  );
+  position: relative; display: flex; align-items: center; justify-content: center;
+}
+.donut::after {
+  content: ''; position: absolute; width: 80px; height: 80px;
+  background: #fff; border-radius: 50%;
+}
+.donut-legend { display: flex; flex-direction: column; gap: .6rem; flex: 1; }
+.donut-item { display: flex; align-items: center; gap: .6rem; }
+.donut-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.donut-item__label { font-size: 1.2rem; color: #1a1a1a; flex: 1; }
+.donut-item__value { font-size: 1.2rem; font-weight: 600; color: #1a1a1a; }
+
+/* ── Table ── */
+.rpt-table { width: 100%; border-collapse: collapse; }
+.rpt-table thead tr { background: var(--green); }
+.rpt-table th {
+  padding: .9rem 1rem; font-size: 1.1rem; font-weight: 600;
+  color: #fff; text-align: left; letter-spacing: .04em;
+}
+.rpt-table td { padding: .85rem 1rem; font-size: 1.2rem; color: #1a1a1a; border-bottom: 1px solid #f0f4f0; }
+.rpt-table tbody tr:hover { background: #f7faf7; }
+.rpt-table tbody tr:last-child td { border-bottom: none; }
+
+/* Status badges */
+.s-badge {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .25rem .8rem; border-radius: 2rem; font-size: 1.05rem; font-weight: 600;
+}
+.s-success  { background: #d4efdf; color: #1e8449; }
+.s-pending  { background: #fef9e7; color: #b7950b; }
+.s-failed   { background: #fdecea; color: #c0392b; }
+.s-refund   { background: #eef2ff; color: #3730a3; }
+
+/* Method badge */
+.m-badge {
+  display: inline-flex; align-items: center; gap: .35rem;
+  font-size: 1.05rem; font-weight: 700; color: #00a550;
+}
+
+/* ── Sparkline (CSS bars) ── */
+.sparkline { display: flex; align-items: flex-end; gap: 4px; height: 60px; }
+.spark-bar { flex: 1; background: var(--green); border-radius: 3px 3px 0 0; min-height: 4px; opacity: .75; transition: opacity .15s; }
+.spark-bar:hover { opacity: 1; }
+
+/* ── Summary row ── */
+.summary-row {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  max-width: 1340px; margin: 1.4rem auto 0; padding: 0 2rem;
+}
+.summary-pill {
+  background: #fff; border-radius: .6rem; padding: .8rem 1.2rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  display: flex; align-items: center; gap: .6rem; flex: 1; min-width: 160px;
+}
+.summary-pill__icon { font-size: 1.8rem; }
+.summary-pill__label { font-size: 1.1rem; color: var(--gray); }
+.summary-pill__value { font-size: 1.5rem; font-weight: 700; color: #1a1a1a; }
+
+/* Print */
+@media print {
+  .rpt-actions, .no-print { display: none !important; }
+  .rpt-wrap { background: #fff; }
+  .rpt-panel { box-shadow: none; border: 1px solid #ddd; }
+}
+</style>
+
+<div class="rpt-wrap">
+
+  <!-- ── Header ── -->
+  <div class="rpt-header">
+    <div class="rpt-header__inner">
+      <div class="rpt-header__top">
+        <div>
+          <h1 class="rpt-header__title">Payment Reports</h1>
+          <p class="rpt-header__sub">SokoDirect · Live marketplace financial flow</p>
+        </div>
+        <div>
+          <span class="rpt-header__badge">Refreshed {{ now|date:"d M Y · H:i" }}</span>
+        </div>
+      </div>
+      <div class="rpt-actions no-print">
+        <a href="?export=csv" class="rpt-btn rpt-btn-primary">⬇ Export CSV</a>
+        <button onclick="window.print()" class="rpt-btn rpt-btn-outline">🖨 Print Report</button>
+        <a href="{% url 'orders_dashboard' %}" class="rpt-btn rpt-btn-outline">Orders</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── KPI Stat Cards ── -->
+  <div class="rpt-stats">
+
+    <div class="stat-card" style="--accent-color:#27AE60" data-icon="">
+      <div class="stat-card__label">Total Revenue</div>
+      <div class="stat-card__value">KES {{ total_revenue|floatformat:0|default:"0" }}</div>
+      <div class="stat-card__sub">From completed payments</div>
+      <div class="stat-card__trend trend-up">↑ All time</div>
+    </div>
+
+    <div class="stat-card" style="--accent-color:#1E3A8A" data-icon="">
+      <div class="stat-card__label">Successful</div>
+      <div class="stat-card__value">{{ success_count|default:"0" }}</div>
+      <div class="stat-card__sub">Payments confirmed</div>
+      <div class="stat-card__trend trend-up">M-Pesa verified</div>
+    </div>
+
+    <div class="stat-card" style="--accent-color:#F5C518" data-icon="">
+      <div class="stat-card__label">Pending</div>
+      <div class="stat-card__value">{{ pending_count|default:"0" }}</div>
+      <div class="stat-card__sub">Awaiting M-Pesa PIN</div>
+      <div class="stat-card__trend">Active now</div>
+    </div>
+
+    <div class="stat-card" style="--accent-color:#C0392B" data-icon="">
+      <div class="stat-card__label">Failed / Cancelled</div>
+      <div class="stat-card__value">{{ failed_count|default:"0" }}</div>
+      <div class="stat-card__sub">PIN rejected or timed out</div>
+      <div class="stat-card__trend trend-down">Needs attention</div>
+    </div>
+
+  </div>
+
+  <!-- ── Summary Pills ── -->
+  <div class="summary-row">
+    <div class="summary-pill">
+      <div class="summary-pill__icon"></div>
+      <div>
+        <div class="summary-pill__label">Avg Transaction</div>
+        <div class="summary-pill__value">KES {{ avg_amount|floatformat:0|default:"0" }}</div>
+      </div>
+    </div>
+    <div class="summary-pill">
+      <div class="summary-pill__icon"></div>
+      <div>
+        <div class="summary-pill__label">M-Pesa Only</div>
+        <div class="summary-pill__value">100%</div>
+      </div>
+    </div>
+    <div class="summary-pill">
+      <div class="summary-pill__icon"></div>
+      <div>
+        <div class="summary-pill__label">Platform</div>
+        <div class="summary-pill__value">SokoDirect</div>
+      </div>
+    </div>
+    <div class="summary-pill">
+      <div class="summary-pill__icon"></div>
+      <div>
+        <div class="summary-pill__label">Success Rate</div>
+        <div class="summary-pill__value">{{ success_rate|floatformat:0|default:"0" }}%</div>
+      </div>
+    </div>
+    <div class="summary-pill">
+      <div class="summary-pill__icon"></div>
+      <div>
+        <div class="summary-pill__label">Total Payments</div>
+        <div class="summary-pill__value">{{ total_payments|default:"0" }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Charts + Breakdown Grid ── -->
+  <div class="rpt-grid">
+
+    <!-- Payment Status Donut -->
+    <div class="rpt-panel">
+      <div class="rpt-panel__head">
+        <div>
+          <div class="rpt-panel__title">Payment Status Breakdown</div>
+          <div class="rpt-panel__sub">All time · all payments</div>
+        </div>
+      </div>
+      <div class="rpt-panel__body">
+        <div class="donut-wrap">
+          <div class="donut" style="--success-pct:{{ success_pct|default:'65%' }}; --pending-pct:{{ pending_pct|default:'80%' }}"></div>
+          <div class="donut-legend">
+            <div class="donut-item">
+              <div class="donut-dot" style="background:#27AE60"></div>
+              <span class="donut-item__label"> Successful</span>
+              <span class="donut-item__value">{{ success_count|default:"0" }}</span>
+            </div>
+            <div class="donut-item">
+              <div class="donut-dot" style="background:#F5C518"></div>
+              <span class="donut-item__label"> Pending</span>
+              <span class="donut-item__value">{{ pending_count|default:"0" }}</span>
+            </div>
+            <div class="donut-item">
+              <div class="donut-dot" style="background:#C0392B"></div>
+              <span class="donut-item__label"> Failed</span>
+              <span class="donut-item__value">{{ failed_count|default:"0" }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue by Day (Sparkline) -->
+    <div class="rpt-panel">
+      <div class="rpt-panel__head">
+        <div>
+          <div class="rpt-panel__title">Revenue Trend</div>
+          <div class="rpt-panel__sub">Last 7 days · daily totals</div>
+        </div>
+      </div>
+      <div class="rpt-panel__body">
+        <div class="sparkline" id="sparkline">
+          {% for day in daily_revenue %}
+          <div class="spark-bar" style="height:{{ day.pct }}%" title="{{ day.label }}: KES {{ day.total|floatformat:0 }}"></div>
+          {% empty %}
+          <div class="spark-bar" style="height:40%"></div>
+          <div class="spark-bar" style="height:60%"></div>
+          <div class="spark-bar" style="height:30%"></div>
+          <div class="spark-bar" style="height:80%"></div>
+          <div class="spark-bar" style="height:55%"></div>
+          <div class="spark-bar" style="height:70%"></div>
+          <div class="spark-bar" style="height:45%"></div>
+          {% endfor %}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:.5rem;">
+          {% for day in daily_revenue %}
+          <span style="font-size:1rem;color:var(--gray)">{{ day.label }}</span>
+          {% empty %}
+          <span style="font-size:1rem;color:var(--gray)">Mon</span>
+          <span style="font-size:1rem;color:var(--gray)">Tue</span>
+          <span style="font-size:1rem;color:var(--gray)">Wed</span>
+          <span style="font-size:1rem;color:var(--gray)">Thu</span>
+          <span style="font-size:1rem;color:var(--gray)">Fri</span>
+          <span style="font-size:1rem;color:var(--gray)">Sat</span>
+          <span style="font-size:1rem;color:var(--gray)">Sun</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Buyers by Payment Volume -->
+    <div class="rpt-panel">
+      <div class="rpt-panel__head">
+        <div>
+          <div class="rpt-panel__title">Top Buyers by Volume</div>
+          <div class="rpt-panel__sub">Ranked by total spend</div>
+        </div>
+      </div>
+      <div class="rpt-panel__body">
+        <div class="bar-chart">
+          {% for buyer in top_buyers %}
+          <div class="bar-row">
+            <div class="bar-row__label">{{ buyer.name|truncatechars:10 }}</div>
+            <div class="bar-row__track">
+              <div class="bar-row__fill" style="width:{{ buyer.pct }}%; background: var(--green);">
+                <span>KES {{ buyer.total|floatformat:0 }}</span>
+              </div>
+            </div>
+            <div class="bar-row__value">{{ buyer.count }} txn</div>
+          </div>
+          {% empty %}
+          <div class="bar-row">
+            <div class="bar-row__label">Martin K.</div>
+            <div class="bar-row__track"><div class="bar-row__fill" style="width:100%;background:var(--green)"><span>KES 10</span></div></div>
+            <div class="bar-row__value">1 txn</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Method Breakdown -->
+    <div class="rpt-panel">
+      <div class="rpt-panel__head">
+        <div>
+          <div class="rpt-panel__title">Payment Methods</div>
+          <div class="rpt-panel__sub">All transactions by method</div>
+        </div>
+      </div>
+      <div class="rpt-panel__body">
+        <div class="bar-chart">
+          <div class="bar-row">
+            <div class="bar-row__label" style="color:#00a550;font-weight:700">M▶PESA</div>
+            <div class="bar-row__track">
+              <div class="bar-row__fill" style="width:100%;background:#00a550">
+                <span>{{ total_payments|default:"0" }} payments</span>
+              </div>
+            </div>
+            <div class="bar-row__value">100%</div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;padding:1rem;background:#f7faf7;border-radius:.5rem;">
+          <p style="font-size:1.2rem;color:var(--gray);line-height:1.7">
+            SokoDirect currently processes all payments exclusively via <strong style="color:#00a550">Safaricom M-Pesa STK Push</strong>.
+            Card and bank transfer support is planned for Phase 2.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Payments Table — full width -->
+    <div class="rpt-panel rpt-panel--full">
+      <div class="rpt-panel__head">
+        <div>
+          <div class="rpt-panel__title">Recent Payment Transactions</div>
+          <div class="rpt-panel__sub">All payment records · newest first</div>
+        </div>
+        <input type="text" placeholder="Search by phone, receipt, buyer..."
+          onkeyup="filterTable(this)"
+          style="padding:.55rem 1rem;border:1px solid #ddd;border-radius:.4rem;font-size:1.2rem;width:260px">
+      </div>
+      <div style="overflow-x:auto">
+        <table class="rpt-table" id="payTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Buyer</th>
+              <th>Phone</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>M-Pesa Receipt</th>
+              <th>Order</th>
+              <th>Status</th>
+              <th>Date & Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in payments %}
+            <tr>
+              <td style="font-weight:600;color:var(--gray)">#{{ forloop.counter }}</td>
+              <td>
+                <div style="font-weight:600;color:#1a1a1a">{{ payment.user.get_full_name }}</div>
+                <div style="font-size:1.05rem;color:var(--gray)">@{{ payment.user.username }}</div>
+              </td>
+              <td style="font-family:monospace;font-size:1.15rem">{{ payment.phone_number }}</td>
+              <td style="font-weight:700;color:var(--green);font-size:1.3rem">KES {{ payment.amount|floatformat:2 }}</td>
+              <td><span class="m-badge">M▶PESA</span></td>
+              <td style="font-family:monospace;font-size:1.05rem;color:var(--gray)">
+                {% if payment.mpesa_receipt %}{{ payment.mpesa_receipt }}{% else %}<em style="opacity:.5">—</em>{% endif %}
+              </td>
+              <td>
+                {% if payment.order %}
+                <a href="#" style="color:var(--blue);font-weight:600">#{{ payment.order.id|truncatechars:8 }}</a>
+                {% else %}—{% endif %}
+              </td>
+              <td>
+                {% if payment.status == 'success' %}
+                  <span class="s-badge s-success"> Success</span>
+                {% elif payment.status == 'pending' %}
+                  <span class="s-badge s-pending"> Pending</span>
+                {% elif payment.status == 'failed' %}
+                  <span class="s-badge s-failed"> Failed</span>
+                {% elif payment.status == 'cancelled' %}
+                  <span class="s-badge s-refund"> Cancelled</span>
+                {% else %}
+                  <span class="s-badge" style="background:#f3f4f6;color:#6b7280">{{ payment.status }}</span>
+                {% endif %}
+              </td>
+              <td style="font-size:1.1rem;color:var(--gray);white-space:nowrap">
+                {{ payment.created|date:"d M Y" }}<br>
+                <span style="font-size:1rem">{{ payment.created|date:"H:i" }}</span>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9" style="text-align:center;padding:3rem;color:var(--gray)">
+                <div style="font-size:3rem;margin-bottom:.8rem">💳</div>
+                <div style="font-size:1.5rem;font-weight:600">No payment records yet</div>
+                <div style="font-size:1.2rem;margin-top:.4rem">Payments will appear here once buyers complete M-Pesa transactions</div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function filterTable(input) {
+  const q = input.value.toLowerCase();
+  document.querySelectorAll('#payTable tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+</script>
+
+{% endblock content %}
